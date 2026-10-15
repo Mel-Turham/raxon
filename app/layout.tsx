@@ -1,18 +1,10 @@
+import type { Metadata } from "next"
 import { Geist_Mono, Inter } from "next/font/google"
 
 import "./globals.css"
-import { Suspense } from "react"
 
-import { HeaderNavBar } from "@/components/layouts"
-import {
-  NotificationsBellFallback,
-  NotificationsSection,
-} from "@/components/notifications"
-import { UserAvatar } from "@/components/shared/user-avatar"
-import { ThemeProvider } from "@/components/theme-provider"
-import { TooltipProvider } from "@/components/ui/tooltip"
-import { CURRENT_USER } from "@/constants"
-import { cn } from "@/lib/utils"
+import { cn } from "@/shared/lib/utils"
+import { AppProviders } from "./providers"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -23,6 +15,22 @@ const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
 })
+
+export const metadata: Metadata = {
+  title: {
+    default: "Raxon",
+    template: "%s · Raxon",
+  },
+  description: "Track your markets, portfolio, and trades with Raxon.",
+  applicationName: "Raxon",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: "Raxon",
+    title: "Raxon",
+    description: "Track your markets, portfolio, and trades with Raxon.",
+  },
+}
 
 export default function RootLayout({
   children,
@@ -40,21 +48,8 @@ export default function RootLayout({
         inter.variable
       )}
     >
-      <body>
-        <ThemeProvider defaultTheme="dark">
-          {/* Shared delay: moving between hints opens them instantly. */}
-          <TooltipProvider delay={250}>
-            <HeaderNavBar
-              userAvatar={<UserAvatar seed={CURRENT_USER.email} />}
-              notifications={
-                <Suspense fallback={<NotificationsBellFallback />}>
-                  <NotificationsSection />
-                </Suspense>
-              }
-            />
-            {children}
-          </TooltipProvider>
-        </ThemeProvider>
+      <body className="grow">
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   )

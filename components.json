@@ -13,15 +13,16 @@
   "iconLibrary": "hugeicons",
   "rtl": false,
   "aliases": {
-    "components": "@/components",
-    "utils": "@/lib/utils",
+    "components": "@/shared",
+    "utils": "@/shared/lib/utils",
     "ui": "@/components/ui",
-    "lib": "@/lib",
-    "hooks": "@/hooks"
+    "lib": "@/shared/lib",
+    "hooks": "@/shared/hooks"
   },
   "menuColor": "default-translucent",
   "menuAccent": "subtle",
   "registries": {
-    "@bklit": "https://ui.bklit.com/r/{name}.json"
+    "@bklit": "https://ui.bklit.com/r/{name}.json",
+    "@logoforge": "https://logoforge.terravidhal.me/r/{name}.json"
   }
 }
