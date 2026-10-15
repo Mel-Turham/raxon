@@ -11,6 +11,12 @@
       transform: translateX(100%);
     }
   }
+  --animate-price-flash: price-flash 0.9s ease-out;
+  @keyframes price-flash {
+    from {
+      background-color: var(--price-flash);
+    }
+  }
   --font-heading: var(--font-sans);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
@@ -72,10 +78,17 @@
   --color-chart-foreground-muted: var(--chart-foreground-muted);
   --color-chart-foreground: var(--chart-foreground);
   --color-chart-background: var(--chart-background);
+  --color-chart-brush-border: var(--chart-brush-border);
+  --color-chart-line-secondary: var(--chart-line-secondary);
+  --color-chart-line-primary: var(--chart-line-primary);
+  --color-legend-track: var(--legend-track);
+  --color-legend-muted-foreground: var(--legend-muted-foreground);
+  --color-legend-muted: var(--legend-muted);
+  --color-legend-foreground: var(--legend-foreground);
+  --color-legend: var(--legend);
 }
 
 :root {
-  /* Raxon — light counterpart (same accent, neutral warm greys) */
   --background: #f5f5f3;
   --foreground: #121210;
   --card: #ffffff;
@@ -103,12 +116,23 @@
   --chart-5: #e5484d;
   --radius: 0.625rem;
   --card-radius: 6px;
+  --card-spacing: calc(var(--spacing) * 4);
+  --metric-accent: var(--primary);
+  --color: var(--muted-foreground);
+  --shimmering-color: var(--foreground);
+  --duration: 1.2s;
+  --gap: 2;
+  --sidebar-width: 16rem;
+  --sidebar-width-icon: 3rem;
+  --skeleton-width: 70%;
+  --transform-origin: center;
+  --anchor-width: auto;
+  --available-height: 100dvh;
   --card-shadow: 0 1px 2px rgb(0 0 0 / 0.04), inset 0 0 0 1px rgb(0 0 0 / 0.04);
 
   --header-shadow: 0 1px 8px 0 rgb(0 0 0 / 0.04);
   --segmented-shadow: inset 0 1px 2px rgb(0 0 0 / 0.03);
-  --segmented-active-shadow:
-    0 1px 3px rgb(0 0 0 / 0.06), 0 0 0 1px rgb(0 0 0 / 0.04);
+  --segmented-active-shadow: var(--icon-surface-shadow);
   --control-active-shadow: none;
 
   --chart-candle-up: var(--success);
@@ -117,8 +141,11 @@
   --chart-ma-slow: var(--chart-1);
   --chart-volume-opacity: 0.45;
   --icon-badge-shadow:
-    inset 0 1px 1px rgb(255 255 255 / 0.35), inset 0 -2px 4px rgb(0 0 0 / 0.22),
-    0 1px 2px rgb(0 0 0 / 0.18);
+    0 1px 2px 0 rgb(0 0 0 / 0.06), 0 0 0 1px rgb(0 0 0 / 0.06),
+    inset 0 1px 0 0 rgb(255 255 255 / 0.5);
+  --icon-surface-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.08), 0 1px 2px 0 rgb(0 0 0 / 0.06),
+    inset 0 1px 0 0 rgb(255 255 255 / 0.7);
 
   --ai-card-glow: color-mix(in oklch, var(--primary) 40%, transparent);
   --ai-orb-core: color-mix(in oklch, var(--primary) 55%, transparent);
@@ -128,11 +155,6 @@
     0 0 64px -6px color-mix(in oklch, var(--primary) 60%, transparent),
     inset 0 2px 10px
       color-mix(in oklch, var(--primary-foreground) 24%, transparent);
-  --ai-cta-from: color-mix(in oklch, var(--primary) 72%, var(--foreground));
-  --ai-cta-shadow:
-    inset 0 1px 0
-      color-mix(in oklch, var(--primary-foreground) 28%, transparent),
-    0 10px 28px -10px color-mix(in oklch, var(--primary) 70%, transparent);
 
   --chart-activity: color-mix(in oklch, var(--foreground) 9%, transparent);
   --chart-guide: color-mix(in oklch, var(--foreground) 14%, transparent);
@@ -161,7 +183,6 @@
   --token-trx: oklch(0.58 0.22 25);
   --token-dmd: oklch(0.5 0.15 255);
 
-  /* Top Gainers glyphs */
   --gainer-bolt: oklch(0.7584 0.0984 240.18);
   --sidebar: #ffffff;
   --sidebar-foreground: #121210;
@@ -171,7 +192,7 @@
   --sidebar-accent-foreground: #121210;
   --sidebar-border: #e3e3e1;
   --sidebar-ring: #d85a32;
-  /* Charts follow the theme tokens (resolved per theme) */
+
   --chart-background: var(--card);
   --chart-foreground: var(--muted-foreground);
   --chart-foreground-muted: var(--muted-foreground);
@@ -189,53 +210,73 @@
   --chart-marker-border: oklch(0.85 0.01 260);
   --chart-marker-foreground: oklch(0.3 0.01 260);
   --chart-label: oklch(0.45 0.01 260);
+  --chart-indicator-color: var(--chart-crosshair);
+  --chart-indicator-secondary-color: var(--chart-line-secondary);
+  --chart-marker-badge-background: var(--chart-marker-background);
+  --chart-marker-badge-foreground: var(--chart-marker-foreground);
+  --chart-segment-background: color-mix(
+    in oklch,
+    var(--chart-line-primary) 12%,
+    transparent
+  );
+  --chart-segment-line: var(--chart-line-primary);
   --chart-scale-01: oklch(0.98 0.003 106);
   --chart-scale-02: oklch(0.92 0.008 106);
   --chart-scale-03: oklch(0.82 0.015 106);
   --chart-scale-04: oklch(0.68 0.02 106);
   --chart-scale-05: oklch(0.55 0.025 106);
   --chart-scale-pattern-color: oklch(0.96 0.005 106);
+  --legend: oklch(1 0 0);
+  --legend-foreground: oklch(0.141 0.005 285.823);
+  --legend-muted: oklch(0.967 0.001 286.375);
+  --legend-muted-foreground: oklch(0.552 0.016 285.938);
+  --legend-track: oklch(0.92 0.004 286.32);
 }
 
 .dark {
   --card-shadow: inset 0 0 4px rgb(0 0 0 / 0.45);
-  --ai-cta-from: color-mix(in oklch, var(--primary) 50%, var(--card));
   --header-shadow: 0 1px 8px 0 rgb(0 0 0 / 0.25);
   --segmented-shadow: inset 0 1px 3px rgb(0 0 0 / 0.5);
-  --segmented-active-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.05), 0 1px 2px rgb(0 0 0 / 0.5);
+  --segmented-active-shadow: var(--icon-surface-shadow);
   --control-active-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
+  --icon-badge-shadow:
+    0 1px 2px 0 rgb(0 0 0 / 0.3), 0 0 0 1px rgb(0 0 0 / 0.45),
+    inset 0 1px 0 0 rgb(255 255 255 / 0.1),
+    inset 0 0 0 1px rgb(255 255 255 / 0.05);
+  --icon-surface-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.4), inset 0 1px 0 0 rgb(255 255 255 / 0.1),
+    inset 0 0 0 1px rgb(255 255 255 / 0.06);
   --chart-day-separator: color-mix(in oklch, var(--foreground) 3%, transparent);
   --chart-hatch: color-mix(in oklch, var(--foreground) 7%, transparent);
   --chart-strip: var(--muted);
   --chart-tooltip-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.06), inset 0 0 16px rgb(0 0 0 / 0.35),
     0 12px 32px rgb(0 0 0 / 0.45);
-  --background: oklch(0.1591 0 0); /* #0d0d0d — body */
-  --foreground: #fffffd; /* primary text */
-  --card: oklch(0.1776 0 0); /* #111111 — header & cards */
+  --background: oklch(0.1591 0 0);
+  --foreground: #fffffd;
+  --card: oklch(0.1776 0 0);
   --card-foreground: #fffffd;
-  --popover: oklch(0.2308 0 0); /* #1d1d1d — tooltip, dropdown */
+  --popover: oklch(0.2308 0 0);
   --popover-foreground: #fffffd;
-  --primary: #d85a32; /* Deposit button, logo */
+  --primary: #d85a32;
   --primary-foreground: #ffffff;
-  --secondary: #20201e; /* Withdraw / Swap / Transfer buttons */
+  --secondary: #20201e;
   --secondary-foreground: #fffffd;
-  --muted: #1b1b19; /* icon buttons, tabs, search, chips */
-  --muted-foreground: oklch(0.683 0 0); /* #999999 — labels, "vs Last Week" */
-  --accent: #171715; /* table header, row hover, alt rows */
+  --muted: #1b1b19;
+  --muted-foreground: oklch(0.683 0 0);
+  --accent: #171715;
   --accent-foreground: #fffffd;
-  --destructive: oklch(0.6014 0.1565 12.76); /* #cc5166 — negative change */
-  --success: oklch(0.7049 0.133 155.22); /* #4fb87b — positive change */
+  --destructive: oklch(0.6014 0.1565 12.76);
+  --success: oklch(0.7049 0.133 155.22);
   --success-foreground: #0d0d0b;
   --border: #1f1f1d;
   --input: #1b1b19;
   --ring: #d85a32;
-  --chart-1: #fe7644; /* main orange (line, bar 1) */
-  --chart-2: #a34d2c; /* bar 2 */
-  --chart-3: #5a2f1f; /* bar 3 / highlight */
-  --chart-4: var(--success); /* green sparkline */
-  --chart-5: var(--destructive); /* red sparkline */
+  --chart-1: #fe7644;
+  --chart-2: #a34d2c;
+  --chart-3: #5a2f1f;
+  --chart-4: var(--success);
+  --chart-5: var(--destructive);
   --sidebar: oklch(0.1776 0 0);
   --sidebar-foreground: #fffffd;
   --sidebar-primary: #d85a32;
@@ -254,6 +295,17 @@
   --chart-scale-04: oklch(0.58 0.06 270);
   --chart-scale-05: oklch(0.68 0.07 270);
   --chart-scale-pattern-color: oklch(0.145 0 0);
+  --chart-background: oklch(0.145 0 0);
+  --chart-foreground: oklch(0.45 0 0);
+  --chart-foreground-muted: oklch(0.65 0.01 260);
+  --chart-crosshair: oklch(0.45 0 0);
+  --chart-grid: oklch(0.25 0 0);
+  --chart-brush-border: var(--chart-grid);
+  --legend: oklch(0.21 0.006 285.885);
+  --legend-foreground: oklch(0.985 0 0);
+  --legend-muted: oklch(0.274 0.006 286.033);
+  --legend-muted-foreground: oklch(0.705 0.015 286.067);
+  --legend-track: oklch(0.274 0.006 286.033);
 }
 
 @layer base {
