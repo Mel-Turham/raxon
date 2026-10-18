@@ -1,4 +1,3 @@
-import { createRandom } from "@/shared/lib/random"
 import { MARKET_ROW_LIMIT } from "../constants"
 import type {
   MarketMover,
@@ -59,16 +58,8 @@ export const signalTone = (signal: MarketSignal): MarketTone =>
 export const quoteChange = (quote: MarketQuote) =>
   ((quote.bid + quote.ask) / 2 / quote.previous - 1) * 100
 
-export const liveFactor = (symbol: string, tick: number, volatility: number) =>
-  tick <= 0
-    ? 1
-    : 1 + (createRandom(`${symbol}:${tick}`)() - 0.5) * 2 * volatility
-
 export const liveChangePercent = (changePercent: number, factor: number) =>
   ((1 + changePercent / 100) * factor - 1) * 100
-
-export const quoteVolatility = (quote: MarketQuote) =>
-  ((quote.high - quote.low) / quote.bid) * 0.1
 
 export const fearGreedLabel = (value: number) => {
   if (value >= 75) return "Extreme greed"

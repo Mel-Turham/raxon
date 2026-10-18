@@ -13,7 +13,6 @@ import {
   MARKET_MOVER_TABS,
   MARKET_ROW_LIMIT,
   MARKET_STAT_IDS,
-  SECTOR_PERIODS,
 } from "../constants"
 
 const TICKER_COUNT = 6
@@ -98,7 +97,7 @@ export const TopMoversSkeleton = () => (
 )
 
 export const SectorPerformanceSkeleton = () => (
-  <SkeletonCard action={<TabsSkeleton count={SECTOR_PERIODS.length} />}>
+  <SkeletonCard action={<Skeleton className="h-3 w-6" />}>
     <RowsSkeleton columns={3} rows={SECTOR_COUNT} />
   </SkeletonCard>
 )

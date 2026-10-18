@@ -1,10 +1,9 @@
 import { ArrowRight02Icon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
-import Image from "next/image"
 import Link from "next/link"
 import { buttonVariants } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { aiAssistantImage } from "@/shared/assets/images"
+import { AiOrb } from "@/features/ai/components/ai-orb"
 import { createKeys } from "@/shared/lib/keys"
 import { cn } from "@/shared/lib/utils"
 
@@ -29,16 +28,7 @@ export const AiInsightCard = () => (
     </div>
 
     <CardContent className="flex flex-1 flex-col items-center justify-between gap-6 text-center">
-      <div className="mt-2 flex size-32 items-center justify-center rounded-full border border-(--ai-orb-rim) bg-[radial-gradient(circle_at_50%_30%,var(--ai-orb-core),var(--ai-orb-edge)_72%)] shadow-(--ai-card-orb-shadow) backdrop-blur-sm">
-        <Image
-          alt="Raxon AI assistant"
-          className="size-24 object-contain drop-shadow-lg"
-          height={96}
-          preload
-          src={aiAssistantImage}
-          width={96}
-        />
-      </div>
+      <AiOrb className="mt-2" interactive />
 
       <div className="flex flex-col gap-2">
         <h3 className="mx-auto max-w-60 text-2xl leading-tight font-semibold text-balance">

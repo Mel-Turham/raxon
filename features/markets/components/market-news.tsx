@@ -34,6 +34,11 @@ export const MarketNews = ({ news }: { news: MarketNewsItem[] }) => (
     contentClassName="gap-0"
     title="Top News"
   >
+    {news.length === 0 && (
+      <p className="flex flex-1 items-center justify-center py-8 text-sm text-muted-foreground">
+        No news available right now.
+      </p>
+    )}
     <ul className="flex flex-1 flex-col">
       {news.map((item) => (
         <li

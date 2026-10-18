@@ -1,22 +1,15 @@
 "use client"
 
-import { useState } from "react"
-
 import { AnimatedNumber } from "@/shared/components/atoms/animated-number"
 import { TokenAvatar } from "@/shared/components/atoms/token-avatar"
 import { TrendBadge } from "@/shared/components/atoms/trend-badge"
-import { SegmentedTabs } from "@/shared/components/molecules/segmented-tabs"
 import { COMPACT_CURRENCY_FORMAT } from "@/shared/lib/format"
 import { cn } from "@/shared/lib/utils"
-import { SECTOR_PERIODS } from "../constants"
-import type { SectorPerformance as Sector, SectorPeriod } from "../types"
+import type { SectorPerformance as Sector } from "../types"
 import { MarketCard } from "./market-card"
 
-const PERIOD_KEY = { "24h": "change24h", "30d": "change30d" } as const
-
 export const SectorPerformance = ({ sectors }: { sectors: Sector[] }) => {
-  const [period, setPeriod] = useState<SectorPeriod>("24h")
-  const changeOf = (sector: Sector) => sector[PERIOD_KEY[period]]
+  const changeOf = (sector: Sector) => sector.change24h
   const ranked = [...sectors].sort((a, b) => changeOf(b) - changeOf(a))
   const maxChange = Math.max(
     ...sectors.map((sector) => Math.abs(changeOf(sector)))
@@ -24,13 +17,7 @@ export const SectorPerformance = ({ sectors }: { sectors: Sector[] }) => {
 
   return (
     <MarketCard
-      action={
-        <SegmentedTabs
-          onValueChange={setPeriod}
-          options={SECTOR_PERIODS}
-          value={period}
-        />
-      }
+      action={<span className="text-xs text-muted-foreground">24h</span>}
       title="Top Performance"
     >
       <ul className="flex flex-1 flex-col">

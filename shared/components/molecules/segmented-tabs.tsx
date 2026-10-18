@@ -15,6 +15,7 @@ type SegmentedTabsProps<T extends string> = {
   icons?: Partial<Record<T, HugeiconsIconProps["icon"]>>
   counts?: Partial<Record<T, number>>
   className?: string
+  listClassName?: string
   activeClassName?: string
 }
 
@@ -32,18 +33,20 @@ export const SegmentedTabs = <T extends string>({
   icons,
   counts,
   className,
+  listClassName,
   activeClassName,
 }: SegmentedTabsProps<T>) => {
   return (
     <Tabs
       value={value}
       onValueChange={(next) => onValueChange(next as T)}
-      className={cn("gap-0", className)}
+      className={cn("max-w-full gap-0", className)}
     >
       <TabsList
         className={cn(
-          "gap-0.5 group-data-horizontal/tabs:h-9 lg:group-data-horizontal/tabs:h-10",
-          LIST_CLASS[variant]
+          "max-w-full [scrollbar-width:none] justify-start gap-0.5 overflow-x-auto group-data-horizontal/tabs:h-9 lg:group-data-horizontal/tabs:h-10",
+          LIST_CLASS[variant],
+          listClassName
         )}
       >
         {options.map((option) => (
@@ -51,7 +54,7 @@ export const SegmentedTabs = <T extends string>({
             key={option}
             value={option}
             className={cn(
-              "h-full min-w-11 px-3 text-xs font-normal text-muted-foreground/80 lg:min-w-13 lg:px-4 lg:text-sm data-active:bg-card data-active:shadow-(--segmented-active-shadow) dark:data-active:border-transparent dark:data-active:bg-muted dark:data-active:text-foreground/90",
+              "h-full min-w-11 shrink-0 px-3 text-xs font-normal text-muted-foreground/80 lg:min-w-13 lg:px-4 lg:text-sm data-active:bg-card data-active:shadow-(--segmented-active-shadow) dark:data-active:border-transparent dark:data-active:bg-muted dark:data-active:text-foreground/90",
               activeClassName
             )}
           >

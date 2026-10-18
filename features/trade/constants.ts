@@ -12,6 +12,16 @@ export {
 
 export const TRADE_PAIRS = ["BTC/USDT", "ETH/USDT", "SOL/USDT"] as const
 
+export const TRADE_PAIR_NAMES: Record<string, string> = {
+  "BTC/USDT": "Bitcoin",
+  "ETH/USDT": "Ethereum",
+  "SOL/USDT": "Solana",
+}
+
+export const ORDER_BOOK_ROWS = 7
+export const MARKET_TRADES_LIMIT = 15
+export const LIVE_FLUSH_MS = 1000
+
 export const DEFAULT_TRADE_PAIR = TRADE_PAIRS[0]
 
 export const parseTradePair = (value: unknown): string =>

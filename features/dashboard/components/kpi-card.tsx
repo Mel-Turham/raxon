@@ -24,9 +24,7 @@ export const KpiCard = ({ name, pair, price, change }: Kpi) => {
           value={price}
         />
         <div className="flex items-center justify-between">
-          <span className="text-[13px] text-muted-foreground">
-            vs Last Week
-          </span>
+          <span className="text-[13px] text-muted-foreground">24h change</span>
           <TrendBadge value={change} />
         </div>
       </CardContent>

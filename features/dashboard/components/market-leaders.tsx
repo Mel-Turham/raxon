@@ -18,6 +18,7 @@ import type { MarketLeadersByPeriod } from "@/features/dashboard/types"
 import { AnimatedNumber } from "@/shared/components/atoms/animated-number"
 import { TrendBadge } from "@/shared/components/atoms/trend-badge"
 import { SegmentedTabs } from "@/shared/components/molecules/segmented-tabs"
+import { COMPACT_CURRENCY_FORMAT } from "@/shared/lib/format"
 
 export const MarketLeaders = ({ data }: { data: MarketLeadersByPeriod }) => {
   const [period, setPeriod] = useState<MarketLeaderPeriod>(
@@ -79,10 +80,12 @@ export const MarketLeaders = ({ data }: { data: MarketLeadersByPeriod }) => {
               <div className="flex items-baseline justify-between gap-2">
                 <AnimatedNumber
                   className="font-mono text-lg tabular-nums"
+                  format={COMPACT_CURRENCY_FORMAT}
                   value={leader.value}
                 />
                 <AnimatedNumber
                   className="font-mono text-[11px] text-muted-foreground tabular-nums"
+                  format={COMPACT_CURRENCY_FORMAT}
                   prefix="24h: "
                   value={leader.change24h}
                 />

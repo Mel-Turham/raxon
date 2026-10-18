@@ -1,8 +1,9 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Geist_Mono, Inter } from "next/font/google"
 
 import "./globals.css"
 
+import { env } from "@/shared/config/env"
 import { cn } from "@/shared/lib/utils"
 import { AppProviders } from "./providers"
 
@@ -16,20 +17,41 @@ const fontMono = Geist_Mono({
   variable: "--font-mono",
 })
 
+const SITE_URL = env.siteUrl
+const DESCRIPTION = "Track your markets, portfolio, and trades with Raxon."
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Raxon",
     template: "%s · Raxon",
   },
-  description: "Track your markets, portfolio, and trades with Raxon.",
+  description: DESCRIPTION,
   applicationName: "Raxon",
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "en_US",
     siteName: "Raxon",
+    url: "/",
     title: "Raxon",
-    description: "Track your markets, portfolio, and trades with Raxon.",
+    description: DESCRIPTION,
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Raxon",
+    description: DESCRIPTION,
+  },
+}
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f5f5f3" },
+    { media: "(prefers-color-scheme: dark)", color: "#121212" },
+  ],
 }
 
 export default function RootLayout({

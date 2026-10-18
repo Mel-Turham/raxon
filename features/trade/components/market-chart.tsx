@@ -18,8 +18,7 @@ import {
   type ChartView,
   DEFAULT_CANDLE_TIMEFRAME,
 } from "@/features/trade/constants"
-import type { MarketTicker, OrderBook } from "@/features/trade/types"
-import { buildCandles } from "@/shared/charts/lib/candles"
+import type { MarketTicker } from "@/features/trade/types"
 import { AnimatedNumber } from "@/shared/components/atoms/animated-number"
 import { TokenAvatar } from "@/shared/components/atoms/token-avatar"
 import { SegmentedTabs } from "@/shared/components/molecules/segmented-tabs"
@@ -31,6 +30,12 @@ import {
   ChartToolbar,
 } from "@/features/trade/components/chart-toolbar"
 import { useTradePair } from "@/features/trade/components/trade-pair-context"
+import { useLiveCandles } from "@/features/trade/hooks/use-live-candles"
+import {
+  useCurrentTicker,
+  useOrderBook,
+  useTickers,
+} from "@/features/trade/hooks/use-trade-data"
 
 const PriceChart = dynamic(
   () =>
@@ -81,12 +86,7 @@ const TickerStats = ({ ticker }: { ticker: MarketTicker }) => {
   )
 }
 
-type MarketChartProps = {
-  tickers: MarketTicker[]
-  book: OrderBook
-}
-
-export const MarketChart = ({ tickers, book }: MarketChartProps) => {
+export const MarketChart = () => {
   const cardRef = useRef<HTMLDivElement>(null)
   const { pair, setPair } = useTradePair()
   const [view, setView] = useState<ChartView>("Candle")
@@ -97,13 +97,12 @@ export const MarketChart = ({ tickers, book }: MarketChartProps) => {
   const [showIndicators, setShowIndicators] = useState(true)
   const [showGrid, setShowGrid] = useState(true)
 
-  const ticker = tickers.find((item) => item.pair === pair) ?? tickers[0]
-  const candles = useMemo(
-    () => buildCandles(ticker.pair, timeframe, ticker.lastPrice),
-    [ticker, timeframe]
-  )
+  const tickers = useTickers()
+  const ticker = useCurrentTicker()
+  const book = useOrderBook()
+  const candles = useLiveCandles(pair, timeframe)
   const visibleCandles = useMemo(
-    () => candles.slice(-visibleCount),
+    () => candles?.slice(-visibleCount) ?? null,
     [candles, visibleCount]
   )
 
@@ -159,7 +158,7 @@ export const MarketChart = ({ tickers, book }: MarketChartProps) => {
       </CardHeader>
 
       <CardContent className="flex flex-1 flex-col gap-2 py-3">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <SegmentedTabs
             options={CHART_VIEWS}
             value={view}
@@ -175,14 +174,20 @@ export const MarketChart = ({ tickers, book }: MarketChartProps) => {
 
         <div className="min-h-90 flex-1">
           {view === "Candle" ? (
-            <PriceChart
-              candles={visibleCandles}
-              revealSignature={`${pair}-${timeframe}`}
-              showGrid={showGrid}
-              showIndicators={showIndicators}
-            />
-          ) : (
+            visibleCandles ? (
+              <PriceChart
+                candles={visibleCandles}
+                revealSignature={`${pair}-${timeframe}`}
+                showGrid={showGrid}
+                showIndicators={showIndicators}
+              />
+            ) : (
+              <ChartAreaSkeleton />
+            )
+          ) : book ? (
             <DepthChart book={book} />
+          ) : (
+            <ChartAreaSkeleton />
           )}
         </div>
 

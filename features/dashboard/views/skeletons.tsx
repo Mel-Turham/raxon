@@ -2,8 +2,11 @@ import { createKeys, withKeys } from "@/shared/lib/keys"
 import {
   MARKET_LEADER_COLORS,
   MARKET_LEADER_PERIODS,
+  PORTFOLIO_ACTION_CLASS,
+  PORTFOLIO_HEADER_CLASS,
   PORTFOLIO_RANGES,
   TRANSACTION_RANGES,
+  TRANSACTIONS_ACTION_CLASS,
 } from "@/features/dashboard/constants"
 import { Card, CardAction, CardContent, CardHeader } from "@/components/ui/card"
 import {
@@ -115,11 +118,11 @@ export const PortfolioChartSkeleton = () => (
 
 export const PortfolioValueSkeleton = () => (
   <Card>
-    <CardHeader className="gap-2">
+    <CardHeader className={cn("gap-2", PORTFOLIO_HEADER_CLASS)}>
       <Skeleton className="h-4 w-28" />
-      <Skeleton className="h-9 w-56" />
+      <Skeleton className="h-9 w-56 max-w-full" />
       <Skeleton className="h-4 w-40" />
-      <CardAction>
+      <CardAction className={PORTFOLIO_ACTION_CLASS}>
         <TabsSkeleton count={PORTFOLIO_RANGES.length} />
       </CardAction>
     </CardHeader>
@@ -135,10 +138,10 @@ export const RecentTransactionsSkeleton = () => (
       <Skeleton className="row-span-2 size-9" />
       <Skeleton className="h-5 w-44" />
       <Skeleton className="h-3 w-52" />
-      <CardAction className="col-start-3 flex items-center gap-3 self-center">
-        <Skeleton className="h-9 w-56 lg:h-10" />
+      <CardAction className={TRANSACTIONS_ACTION_CLASS}>
+        <Skeleton className="h-9 w-full sm:w-auto sm:flex-1 lg:h-10 lg:w-56 lg:flex-none" />
         <TabsSkeleton count={TRANSACTION_RANGES.length} />
-        <Skeleton className="h-9 w-20 lg:h-10" />
+        <Skeleton className="ml-auto h-9 w-20 lg:h-10" />
       </CardAction>
     </CardHeader>
     <CardContent>

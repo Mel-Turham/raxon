@@ -48,7 +48,7 @@ type ChartToolbarProps = {
 }
 
 export const ChartToolbar = ({ onAction, active }: ChartToolbarProps) => (
-  <div className="flex items-center gap-0.5">
+  <div className="-mx-1 flex max-w-full [scrollbar-width:none] items-center gap-0.5 overflow-x-auto px-1">
     {TOOLBAR_ITEMS.map(({ label, icon, action }) => (
       <button
         key={label}
@@ -59,7 +59,7 @@ export const ChartToolbar = ({ onAction, active }: ChartToolbarProps) => (
         aria-pressed={action ? Boolean(active[action]) : undefined}
         onClick={() => action && onAction(action)}
         className={cn(
-          "flex size-8 items-center justify-center text-muted-foreground transition-colors hover:bg-foreground/[0.04] hover:text-foreground disabled:pointer-events-none disabled:opacity-40",
+          "flex size-8 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:bg-foreground/[0.04] hover:text-foreground disabled:pointer-events-none disabled:opacity-40",
           action && active[action] && "text-foreground"
         )}
       >

@@ -22,6 +22,7 @@ import {
   TRANSACTION_DEFAULT_RANGE,
   TRANSACTION_INTERVALS,
   TRANSACTION_RANGES,
+  TRANSACTIONS_ACTION_CLASS,
   type TransactionInterval,
   type TransactionRange,
 } from "@/features/dashboard/constants"
@@ -52,9 +53,9 @@ export const RecentTransactions = ({
         <CardDescription className="text-[11px]">
           Keep track of all transactions here
         </CardDescription>
-        <CardAction className="col-start-3 flex items-center gap-3 self-center">
+        <CardAction className={TRANSACTIONS_ACTION_CLASS}>
           <SearchInput
-            containerClassName="w-56"
+            containerClassName="w-full sm:w-auto sm:flex-1 lg:w-56 lg:flex-none"
             placeholder="Search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -71,7 +72,7 @@ export const RecentTransactions = ({
               setTimeInterval(value as TransactionInterval)
             }
           >
-            <SelectTrigger className="h-9 min-w-20 border-border bg-accent text-sm data-[size=default]:h-9 lg:data-[size=default]:h-10 dark:bg-accent dark:hover:bg-accent">
+            <SelectTrigger className="ml-auto h-9 min-w-20 border-border bg-accent text-sm data-[size=default]:h-9 lg:data-[size=default]:h-10 dark:bg-accent dark:hover:bg-accent">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

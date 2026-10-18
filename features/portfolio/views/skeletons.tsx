@@ -22,23 +22,23 @@ export const WatchlistSkeleton = () => (
 export const MetricCardsSkeleton = () => (
   <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
     {createKeys(METRIC_COUNT).map((key) => (
-      <Card key={key} className="gap-4">
+      <Card key={key} className="@container/metric gap-4">
         <CardHeader className="items-center">
           <div className="flex items-center gap-2.5">
             <Skeleton className="size-9 rounded-(--card-radius)" />
-            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-4 w-16 @[16rem]/metric:w-24" />
           </div>
           <CardAction>
             <Skeleton className="h-5 w-6" />
           </CardAction>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <div className="flex items-end justify-between">
+          <div className="flex flex-col gap-2 @[16rem]/metric:flex-row @[16rem]/metric:items-end @[16rem]/metric:justify-between">
             <div className="flex flex-col gap-1.5">
-              <Skeleton className="h-3 w-28" />
-              <Skeleton className="h-7 w-32" />
+              <Skeleton className="h-3 w-full max-w-28" />
+              <Skeleton className="h-7 w-full max-w-32" />
             </div>
-            <Skeleton className="h-10 w-24" />
+            <Skeleton className="h-8 w-full @[16rem]/metric:h-10 @[16rem]/metric:w-24" />
           </div>
           <div className="flex flex-col gap-1.5">
             <div className="flex justify-between">

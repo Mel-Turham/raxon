@@ -3,14 +3,18 @@
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { useState } from "react"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Card, CardAction, CardContent, CardHeader } from "@/components/ui/card"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import type { OrderBook as OrderBookData, Trade } from "@/features/trade/types"
+import type { OrderBook as OrderBookData } from "@/features/trade/types"
 import { AnimatedNumber } from "@/shared/components/atoms/animated-number"
 import { SegmentedTabs } from "@/shared/components/molecules/segmented-tabs"
 import { CURRENCY_FORMAT, decimalFormat } from "@/shared/lib/format"
 import { cn } from "@/shared/lib/utils"
 
+import { ORDER_BOOK_ROWS } from "../constants"
+import { useMarketTrades, useOrderBook } from "../hooks/use-trade-data"
+import { useLiveStatus } from "../state/live-market"
+import { OrderBookLevelsSkeleton } from "../views/skeletons"
 import { TradesTable } from "./trades-table"
 
 const TABS = ["Order Book", "Trade history"] as const
@@ -111,31 +115,68 @@ const LastPrice = ({ book }: { book: OrderBookData }) => {
   )
 }
 
-type OrderBookProps = {
-  book: OrderBookData
-  trades: Trade[]
-}
-
-export const OrderBook = ({ book, trades }: OrderBookProps) => {
-  const [tab, setTab] = useState<Tab>("Order Book")
-  const [view, setView] = useState<View>("both")
-
+const BookLevels = ({ book, view }: { book: OrderBookData; view: View }) => {
+  const asks = book.asks.slice(0, ORDER_BOOK_ROWS)
+  const bids = book.bids.slice(0, ORDER_BOOK_ROWS)
   const maxAmount = Math.max(
-    ...book.asks.map((level) => level.amount),
-    ...book.bids.map((level) => level.amount)
+    ...asks.map((level) => level.amount),
+    ...bids.map((level) => level.amount)
   )
 
-  const asks = [...book.asks].reverse()
+  return (
+    <>
+      {view !== "bids" && (
+        <BookSide
+          side="asks"
+          levels={[...asks].reverse()}
+          maxAmount={maxAmount}
+        />
+      )}
+      <LastPrice book={book} />
+      {view !== "asks" && (
+        <BookSide side="bids" levels={bids} maxAmount={maxAmount} />
+      )}
+    </>
+  )
+}
+
+const LiveStatus = () => {
+  const status = useLiveStatus()
+  const isLive = status === "live"
+
+  return (
+    <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+      <span
+        className={cn(
+          "size-1.5 rounded-full",
+          isLive ? "animate-pulse bg-success" : "bg-muted-foreground/50"
+        )}
+      />
+      {isLive ? "Live" : status === "connecting" ? "Connecting" : "Offline"}
+    </span>
+  )
+}
+
+export const OrderBook = () => {
+  const [tab, setTab] = useState<Tab>("Order Book")
+  const [view, setView] = useState<View>("both")
+  const book = useOrderBook()
+  const trades = useMarketTrades()
 
   return (
     <Card className="gap-3">
       <CardHeader>
         <SegmentedTabs options={TABS} value={tab} onValueChange={setTab} />
+        <CardAction className="self-center">
+          <LiveStatus />
+        </CardAction>
       </CardHeader>
 
       <CardContent className="flex flex-col gap-2">
         {tab === "Trade history" ? (
           <TradesTable trades={trades} />
+        ) : !book ? (
+          <OrderBookLevelsSkeleton />
         ) : (
           <>
             <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -163,13 +204,7 @@ export const OrderBook = ({ book, trades }: OrderBookProps) => {
               <span>Price ({book.quote})</span>
             </div>
 
-            {view !== "bids" && (
-              <BookSide side="asks" levels={asks} maxAmount={maxAmount} />
-            )}
-            <LastPrice book={book} />
-            {view !== "asks" && (
-              <BookSide side="bids" levels={book.bids} maxAmount={maxAmount} />
-            )}
+            <BookLevels book={book} view={view} />
           </>
         )}
       </CardContent>

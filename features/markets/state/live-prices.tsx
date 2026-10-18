@@ -3,42 +3,95 @@
 import {
   createContext,
   type ReactNode,
+  useCallback,
   useContext,
   useEffect,
+  useMemo,
+  useRef,
   useState,
 } from "react"
 
-import { LIVE_TICK_MS, LIVE_VOLATILITY } from "../constants"
-import { liveFactor } from "../helpers/markets"
+import { useBinanceStream } from "@/shared/hooks/use-binance-stream"
+import { LIVE_TICK_MS } from "../constants"
 
-const LiveTickContext = createContext(0)
+type RawMiniTicker = { s: string; c: string }
+
+type Prices = Record<string, number>
+
+type LivePrices = {
+  tick: number
+  prices: Prices
+  previous: Prices
+  register: (symbol: string) => () => void
+}
+
+const QUOTE = "USDT"
+
+const LivePricesContext = createContext<LivePrices | null>(null)
 
 export const LivePricesProvider = ({ children }: { children: ReactNode }) => {
-  const [tick, setTick] = useState(0)
+  const [symbols, setSymbols] = useState<string[]>([])
+  const [state, setState] = useState({ tick: 0, prices: {}, previous: {} })
+  const counts = useRef(new Map<string, number>())
+  const pending = useRef<Prices>({})
+
+  const register = useCallback((symbol: string) => {
+    if (symbol === QUOTE) return () => {}
+    const sync = () => setSymbols([...counts.current.keys()].sort())
+    const count = counts.current.get(symbol) ?? 0
+    counts.current.set(symbol, count + 1)
+    if (count === 0) sync()
+    return () => {
+      const left = (counts.current.get(symbol) ?? 1) - 1
+      if (left > 0) return counts.current.set(symbol, left)
+      counts.current.delete(symbol)
+      sync()
+    }
+  }, [])
+
+  const streams = useMemo(
+    () => symbols.map((symbol) => `${symbol.toLowerCase()}usdt@miniTicker`),
+    [symbols]
+  )
+
+  useBinanceStream(streams, (_, data) => {
+    const { s, c } = data as RawMiniTicker
+    pending.current[s.slice(0, -QUOTE.length)] = Number(c)
+  })
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      if (!document.hidden) setTick((current) => current + 1)
+      const updates = pending.current
+      if (document.hidden || Object.keys(updates).length === 0) return
+      pending.current = {}
+      setState((current) => ({
+        tick: current.tick + 1,
+        previous: current.prices,
+        prices: { ...current.prices, ...updates },
+      }))
     }, LIVE_TICK_MS)
     return () => window.clearInterval(timer)
   }, [])
 
-  return <LiveTickContext value={tick}>{children}</LiveTickContext>
+  const value = useMemo(() => ({ ...state, register }), [state, register])
+
+  return <LivePricesContext value={value}>{children}</LivePricesContext>
 }
 
-export const useLivePrice = (
-  symbol: string,
-  price: number,
-  volatility = LIVE_VOLATILITY
-) => {
-  const tick = useContext(LiveTickContext)
-  const factor = liveFactor(symbol, tick, volatility)
-  const delta = factor - liveFactor(symbol, tick - 1, volatility)
+export const useLivePrice = (symbol: string, price: number) => {
+  const context = useContext(LivePricesContext)
+  if (!context) {
+    throw new Error("useLivePrice must be used inside <LivePricesProvider>.")
+  }
+  const { register, prices, previous, tick } = context
 
+  useEffect(() => register(symbol), [register, symbol])
+
+  const live = prices[symbol] ?? price
   return {
     tick,
-    factor,
-    price: price * factor,
-    delta: tick === 0 ? 0 : delta,
+    factor: price ? live / price : 1,
+    price: live,
+    delta: live - (previous[symbol] ?? live),
   }
 }

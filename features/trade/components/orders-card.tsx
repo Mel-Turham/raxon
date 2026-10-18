@@ -84,16 +84,15 @@ const COLUMNS: Record<OrderTab, Column[]> = {
       ),
     },
     {
-      key: "margin",
-      label: "Margin",
+      key: "filled",
+      label: "Filled",
       align: "center",
-      sortValue: (order) => order.margin,
-
+      sortValue: (order) => order.filled,
       render: (order) => (
         <AnimatedNumber
-          className={order.pnl >= 0 ? "text-success" : "text-destructive"}
-          format={decimalFormat(2)}
-          value={order.margin}
+          format={decimalFormat(0)}
+          suffix="%"
+          value={order.filled}
         />
       ),
     },
