@@ -106,6 +106,54 @@ export const MovingAverages = () => {
   )
 }
 
+export const LastPriceLine = () => {
+  const { data, yScale, innerWidth } = useChart()
+  const last = (data as Candle[]).at(-1)
+  if (!last) return null
+
+  const y = yScale(last.close) ?? 0
+  const color =
+    last.close >= last.open
+      ? "var(--chart-candle-up)"
+      : "var(--chart-candle-down)"
+
+  return (
+    <g
+      className="pointer-events-none"
+      style={{
+        transform: `translateY(${y}px)`,
+        transition: "transform 0.3s ease-out",
+      }}
+    >
+      <line
+        stroke={color}
+        strokeDasharray="4 3"
+        x1={0}
+        x2={innerWidth + TAG_GAP}
+        y1={0}
+        y2={0}
+      />
+      <rect
+        fill={color}
+        height={TAG_HEIGHT}
+        width={TAG_WIDTH}
+        x={innerWidth + TAG_GAP}
+        y={-TAG_HEIGHT / 2}
+      />
+      <text
+        dominantBaseline="central"
+        fill="var(--primary-foreground)"
+        fontSize={11}
+        textAnchor="middle"
+        x={innerWidth + TAG_GAP + TAG_WIDTH / 2}
+        y={0}
+      >
+        {tagPriceFormatter.format(last.close)}
+      </text>
+    </g>
+  )
+}
+
 export const CandleTooltip = ({ candle }: { candle: Candle }) => {
   const rows = [
     ["Open", candle.open],

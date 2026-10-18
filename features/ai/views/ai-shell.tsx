@@ -29,7 +29,7 @@ function WorkspaceSidebar({ userAvatar }: { userAvatar: ReactNode }) {
       onOpen={workspace.openConversation}
       onShare={workspace.shareConversation}
       onUpdate={workspace.updateConversation}
-      plan={workspace.insights.plan}
+      plan={workspace.plan}
       userAvatar={userAvatar}
     />
   )

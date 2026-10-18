@@ -4,4 +4,7 @@ export type PortfolioRange = (typeof PORTFOLIO_RANGES)[number]
 
 export const PORTFOLIO_DEFAULT_RANGE: PortfolioRange = "7D"
 
-export const PORTFOLIO_CURRENT_VALUE = 83_727.9
+export const PORTFOLIO_HEADER_CLASS =
+  "max-sm:has-data-[slot=card-action]:grid-cols-1"
+export const PORTFOLIO_ACTION_CLASS =
+  "max-sm:col-start-1 max-sm:row-span-1 max-sm:row-start-auto max-sm:mt-3 max-sm:justify-self-stretch"

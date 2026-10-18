@@ -1,4 +1,3 @@
-import type { ChainId } from "@/shared/config/chains"
 import type { MarketLeaderPeriod } from "../constants/market-leaders"
 import type { TransactionInterval } from "../constants/transactions"
 
@@ -47,7 +46,9 @@ export type Transaction = {
 export type TransactionSortKey = "change" | "change7d" | "volume" | "marketCap"
 
 export type Balance = {
-  byChain: Record<ChainId, number>
+  total: number
+  available: number
+  inOrders: number
 
   updatedAt: string
 }

@@ -1,28 +1,60 @@
 import "server-only"
 
-import { cache } from "react"
-
 import {
-  MOCK_ACTIVE_ORDERS,
-  MOCK_MARKET_TRADES,
-  MOCK_ORDER_BOOK,
-  MOCK_ORDER_HISTORY,
-  MOCK_RUNNING_TRADES,
-  MOCK_TICKERS,
-  MOCK_TRADING_ACCOUNT,
-} from "@/features/trade/mocks/mock-trade-data"
-import { request } from "@/shared/api/request"
+  type AccountOrder,
+  getAccountTrades,
+  getFeeRate,
+  getHoldings,
+  getOpenOrders,
+  getOrderHistory as getAccountOrderHistory,
+} from "@/shared/account"
+import type { Order, Trade, TradingAccount } from "../types"
 
-export const getOrderBook = cache(() => request(MOCK_ORDER_BOOK))
+const RECENT_TRADES = 5
+const ORDER_HISTORY_LIMIT = 20
 
-export const getMarketTrades = () => request(MOCK_MARKET_TRADES)
+const toOrder = (order: AccountOrder): Order => ({
+  id: order.id,
+  pair: `${order.base}/${order.quote}`,
+  side: order.side,
+  status: order.status,
+  entryPrice: order.price,
+  filled: order.amount ? (order.filled / order.amount) * 100 : 0,
+  amount: order.amount,
+  value: order.price * order.amount,
+  createdAt: order.createdAt,
+})
 
-export const getRunningTrades = () => request(MOCK_RUNNING_TRADES)
+const newestFirst = (a: Order, b: Order) =>
+  b.createdAt.localeCompare(a.createdAt)
 
-export const getMarketTickers = cache(() => request(MOCK_TICKERS))
+export const getRunningTrades = async (): Promise<Trade[]> =>
+  (await getAccountTrades())
+    .slice(-RECENT_TRADES)
+    .reverse()
+    .map(({ id, price, amount, side, executedAt }) => ({
+      id,
+      price,
+      amount,
+      side,
+      executedAt,
+    }))
 
-export const getTradingAccount = () => request(MOCK_TRADING_ACCOUNT)
+export const getTradingAccount = async (): Promise<TradingAccount> => {
+  const [holdings, feeRate] = await Promise.all([getHoldings(), getFeeRate()])
+  return {
+    balances: Object.fromEntries(
+      holdings.map((holding) => [holding.symbol, holding.free])
+    ),
+    feeRate,
+  }
+}
 
-export const getActiveOrders = () => request(MOCK_ACTIVE_ORDERS)
+export const getActiveOrders = async () =>
+  (await getOpenOrders()).map(toOrder).sort(newestFirst)
 
-export const getOrderHistory = () => request(MOCK_ORDER_HISTORY)
+export const getOrderHistory = async () =>
+  (await getAccountOrderHistory())
+    .map(toOrder)
+    .sort(newestFirst)
+    .slice(0, ORDER_HISTORY_LIMIT)

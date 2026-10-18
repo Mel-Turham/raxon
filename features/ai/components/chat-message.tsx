@@ -16,12 +16,11 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/toast"
 import { HintTooltip } from "@/shared/components/molecules/hint-tooltip"
-import { withKeys } from "@/shared/lib/keys"
 import { SOFT_TRANSITION } from "@/shared/lib/motion"
 import { cn } from "@/shared/lib/utils"
-import { revealBlocks } from "../helpers/stream"
 import type { ChatMessage } from "../types"
-import { AiBlockView } from "./ai-blocks"
+import { useSmoothText } from "../hooks/use-smooth-text"
+import { AiMarkdown } from "./ai-markdown"
 import { MessageSources } from "./ai-sources"
 import { AiOrb } from "./ai-orb"
 import { ContextChip } from "./composer/context-chip"
@@ -272,15 +271,10 @@ function AssistantMessage({
   const [feedback, setFeedback] = useState<"up" | "down" | null>(null)
   const isWorking =
     message.status === "thinking" || message.status === "streaming"
-  const blocks = revealBlocks(message.blocks, message.revealed)
+  const text = useSmoothText(message.text, isWorking)
+  const isTyping = isWorking || text.length < message.text.length
 
-  const copy = () =>
-    copyText(
-      message.blocks
-        .flatMap((block) => (block.type === "text" ? [block.text] : []))
-        .join("\n\n")
-        .replaceAll("**", "")
-    )
+  const copy = () => copyText(message.text.replaceAll("**", ""))
 
   return (
     <motion.div
@@ -315,25 +309,13 @@ function AssistantMessage({
               thoughtMs={message.thoughtMs}
             />
           )}
-          {message.status !== "thinking" &&
-            withKeys(blocks, `${message.id}-block`).map(
-              ({ key, value: block }) => (
-                <motion.div
-                  animate={{ opacity: 1 }}
-                  initial={{ opacity: block.type === "text" ? 1 : 0 }}
-                  key={key}
-                  transition={SOFT_TRANSITION}
-                >
-                  <AiBlockView block={block} />
-                </motion.div>
-              )
-            )}
+          {text && <AiMarkdown text={text} />}
 
-          {message.status === "done" && (
+          {message.status === "done" && !isTyping && (
             <MessageSources nudge={message.nudge} sources={message.sources} />
           )}
 
-          {message.status === "streaming" && (
+          {isTyping && message.status !== "thinking" && (
             <span className="-mt-2 size-2 animate-pulse rounded-full bg-primary" />
           )}
 
@@ -344,7 +326,7 @@ function AssistantMessage({
           )}
         </div>
 
-        {message.status === "done" && (
+        {message.status === "done" && !isTyping && (
           <div
             className={cn(
               "-ml-1.5 flex items-center gap-0.5 transition-opacity",

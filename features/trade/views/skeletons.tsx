@@ -25,26 +25,32 @@ const BookSideSkeleton = () => (
   </div>
 )
 
+export const OrderBookLevelsSkeleton = () => (
+  <>
+    <div className="flex items-center justify-between">
+      <Skeleton className="h-3 w-10" />
+      <Skeleton className="h-7 w-24" />
+    </div>
+    <div className="flex justify-between">
+      <Skeleton className="h-3 w-20" />
+      <Skeleton className="h-3 w-20" />
+    </div>
+    <BookSideSkeleton />
+    <div className="flex items-center justify-between border-y border-border py-2.5">
+      <Skeleton className="h-4 w-36" />
+      <Skeleton className="size-4" />
+    </div>
+    <BookSideSkeleton />
+  </>
+)
+
 export const OrderBookSkeleton = () => (
   <Card className="gap-3">
     <CardHeader>
       <TabsSkeleton count={2} />
     </CardHeader>
     <CardContent className="flex flex-col gap-2">
-      <div className="flex items-center justify-between">
-        <Skeleton className="h-3 w-10" />
-        <Skeleton className="h-7 w-24" />
-      </div>
-      <div className="flex justify-between">
-        <Skeleton className="h-3 w-20" />
-        <Skeleton className="h-3 w-20" />
-      </div>
-      <BookSideSkeleton />
-      <div className="flex items-center justify-between border-y border-border py-2.5">
-        <Skeleton className="h-4 w-36" />
-        <Skeleton className="size-4" />
-      </div>
-      <BookSideSkeleton />
+      <OrderBookLevelsSkeleton />
     </CardContent>
   </Card>
 )

@@ -7,7 +7,6 @@ import {
   Mic01Icon,
   PlusSignIcon,
   SlashIcon,
-  SparklesIcon,
   StopIcon,
 } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
@@ -36,27 +35,20 @@ import {
   isLink,
   linkAttachment,
 } from "../../helpers/attachments"
-import { enhancePrompt } from "../../helpers/replies"
+import { enhancePrompt } from "../../helpers/prompts"
 import { useVoiceInput } from "../../hooks/use-voice-input"
 import type { ChatAttachment, ChatTool } from "../../types"
 import { type ComposerMenuItem, ComposerMenu } from "./composer-menu"
 import { ComposerSources } from "./composer-sources"
 import { ContextChip } from "./context-chip"
 import { DropZone } from "./drop-zone"
-import { RAISED_HOVER, RAISED_SURFACE } from "../surface"
 
 const ENHANCE_MS = 700
-const FOLLOW_UP_COLORS = [
-  "var(--primary)",
-  "var(--success)",
-  "#a855f7",
-  "#3b82f6",
-]
 const FIELD_SHELL =
   "relative flex flex-col gap-3 overflow-hidden rounded-[20px] border border-foreground/10 bg-background p-3 pb-2.5 transition-colors focus-within:border-foreground/25 dark:border-foreground/[0.07] dark:bg-linear-to-b dark:from-foreground/[0.07] dark:to-foreground/[0.03] dark:shadow-[inset_0_1px_0_color-mix(in_oklch,var(--foreground)_8%,transparent),0_1px_2px_rgb(0_0_0/0.3)] dark:focus-within:border-foreground/20"
 
 const FIELD_TEXT =
-  "col-start-1 row-start-1 min-h-18 w-full text-[15px] leading-6 break-words whitespace-pre-wrap"
+  "col-start-1 row-start-1 min-h-14 w-full text-base leading-6 sm:min-h-18 sm:text-[15px] break-words whitespace-pre-wrap"
 
 type MenuState =
   | { kind: "prompts"; query: string; start: number }
@@ -92,9 +84,12 @@ type ChatComposerProps = {
   draft: string
   sources: AiSource[]
   planName: string
-  followUps: string[]
   isStreaming: boolean
-  onSend: (prompt: string, attachments: ChatAttachment[]) => void
+  onSend: (
+    prompt: string,
+    attachments: ChatAttachment[],
+    tools: ChatTool[]
+  ) => void
   onStop: () => void
   onTyping?: () => void
 }
@@ -104,7 +99,6 @@ export function ChatComposer({
   draft,
   sources,
   planName,
-  followUps,
   isStreaming,
   onSend,
   onStop,
@@ -242,7 +236,7 @@ export function ChatComposer({
 
   const submit = () => {
     if (!canSend) return
-    onSend(value, attachments)
+    onSend(value, attachments, tools)
     update("")
     setAttachments([])
   }
@@ -589,42 +583,8 @@ export function ChatComposer({
         </div>
       </div>
 
-      <AnimatePresence initial={false}>
-        {!isStreaming && followUps.length > 0 && (
-          <motion.div
-            animate={{ opacity: 1, filter: "blur(0px)" }}
-            className="flex flex-wrap gap-2"
-            exit={{ opacity: 0, filter: "blur(2px)" }}
-            initial={{ opacity: 0, filter: "blur(2px)" }}
-            transition={SOFT_TRANSITION}
-          >
-            {followUps.map((followUp, index) => (
-              <button
-                className={cn(
-                  "flex h-8 items-center gap-2 rounded-full px-3 text-xs",
-                  RAISED_SURFACE,
-                  RAISED_HOVER
-                )}
-                key={followUp}
-                onClick={() => onSend(followUp, [])}
-                type="button"
-              >
-                <HugeiconsIcon
-                  icon={SparklesIcon}
-                  size={14}
-                  style={{
-                    color: FOLLOW_UP_COLORS[index % FOLLOW_UP_COLORS.length],
-                  }}
-                />
-                {followUp}
-              </button>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-muted-foreground">
-        <span className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-center text-[11px] text-muted-foreground">
+        <span className="hidden items-center gap-3 sm:flex">
           <span className="flex items-center gap-1">
             <Kbd>/</Kbd> prompts
           </span>

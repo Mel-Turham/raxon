@@ -26,11 +26,7 @@ import { useSortedRows } from "@/shared/hooks/use-sorted-rows"
 import { ONE_DECIMAL_FORMAT } from "@/shared/lib/format"
 import { cn } from "@/shared/lib/utils"
 import { MARKET_INSIGHT_SEGMENTS } from "../constants"
-import {
-  quoteChange,
-  quoteSpreadBps,
-  quoteVolatility,
-} from "../helpers/markets"
+import { quoteChange, quoteSpreadBps } from "../helpers/markets"
 import { useLivePrice } from "../state/live-prices"
 import type {
   MarketInsights as Insights,
@@ -70,7 +66,7 @@ const COLUMNS: { key: QuoteColumn; label: string; align: Align }[] = [
 const NUMERIC_CELL = cn(LIST_TABLE.cell, "text-right font-mono tabular-nums")
 
 const QuoteRow = ({ quote }: { quote: MarketQuote }) => {
-  const live = useLivePrice(quote.base, quote.bid, quoteVolatility(quote))
+  const live = useLivePrice(quote.base, quote.bid)
   const liveQuote = {
     ...quote,
     bid: live.price,

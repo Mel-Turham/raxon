@@ -1,32 +1,8 @@
 import {
-  ChartLineData02Icon,
   GlobalSearchIcon,
   Idea01Icon,
-  PieChart01Icon,
-  Target02Icon,
   Telescope01Icon,
 } from "@hugeicons/core-free-icons"
-
-export const WELCOME_CARDS = [
-  {
-    icon: PieChart01Icon,
-    title: "Portfolio Check-up",
-    description: "Allocation, risk and rebalance ideas",
-    prompt: "Analyze my portfolio and suggest a rebalance",
-  },
-  {
-    icon: ChartLineData02Icon,
-    title: "Market Pulse",
-    description: "What's moving the market and why",
-    prompt: "What's moving BTC today?",
-  },
-  {
-    icon: Target02Icon,
-    title: "Trade Planner",
-    description: "Entry, stop-loss and targets",
-    prompt: "Plan a BTC trade with entry, stop-loss and take-profit",
-  },
-] as const
 
 export const AI_STRATEGIES = [
   "BTC swing trades",
@@ -81,9 +57,13 @@ export const SENTIMENT_ZONES = [
   { max: 100, label: "Extreme greed", color: "var(--success)" },
 ] as const
 
-export const STREAM_CHARS_PER_TICK = 7
-export const STREAM_TICK_MS = 28
-export const REASONING_STEP_MS = 850
+export const AI_PLAN = { name: "Free", limit: 50, discount: 20 } as const
+
+export const AI_CONVERSATIONS_KEY = "raxon:ai-conversations"
+
+export const AI_SIGNAL_SYMBOLS = ["BTC", "ETH", "SOL"]
+
+export const SENTIMENT_HISTORY_DAYS = 7
 
 export const AI_CHAT_PATH = "/ai"
 export const AI_INTEGRATIONS_PATH = "/ai/integrations"

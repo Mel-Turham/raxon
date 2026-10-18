@@ -4,6 +4,7 @@ import { useState } from "react"
 
 import { AuthLogo } from "@/features/auth/components/login/auth-logo"
 import { AuthVisual } from "@/features/auth/components/login/auth-visual"
+import { DemoNotice } from "@/features/auth/components/login/demo-notice"
 import { LoginForm } from "@/features/auth/components/login/login-form"
 
 export function Login() {
@@ -23,6 +24,7 @@ export function Login() {
         </section>
         <AuthVisual scene="login" />
       </div>
+      <DemoNotice />
     </main>
   )
 }

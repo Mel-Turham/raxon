@@ -9,14 +9,15 @@ import {
 import { useAiWorkspace } from "../state/ai-workspace"
 
 export function AiView({ draft }: { draft: string }) {
-  const { chat, insights, walletAssets, aiSources, newChat } = useAiWorkspace()
+  const { chat, insights, plan, walletAssets, aiSources, newChat } =
+    useAiWorkspace()
 
   return (
     <div className="flex min-h-0 flex-1">
       <AiChat
         assets={walletAssets}
         draft={draft}
-        planName={insights.plan.name}
+        planName={plan.name}
         sources={aiSources}
         isStreaming={chat.isStreaming}
         messages={chat.messages}

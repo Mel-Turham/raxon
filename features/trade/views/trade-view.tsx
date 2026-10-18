@@ -23,12 +23,12 @@ export function TradeView({ pair }: { pair: string }) {
       initialPair={pair}
       orderBook={
         <Suspense fallback={<OrderBookSkeleton />}>
-          <OrderBookSection />
+          <OrderBookSection pair={pair} />
         </Suspense>
       }
       marketChart={
         <Suspense fallback={<MarketChartSkeleton />}>
-          <MarketChartSection />
+          <MarketChartSection pair={pair} />
         </Suspense>
       }
       orderForm={

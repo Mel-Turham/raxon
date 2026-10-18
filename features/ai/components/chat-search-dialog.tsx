@@ -22,12 +22,14 @@ import { Kbd } from "@/components/ui/kbd"
 import { DialogHints } from "@/shared/components/molecules/dialog-hints"
 import type { AiConversation } from "../types"
 
-const timeAgo = (minutes: number) =>
-  minutes < 60
+const timeAgo = (timestamp: number) => {
+  const minutes = Math.max(0, Math.round((Date.now() - timestamp) / 60_000))
+  return minutes < 60
     ? `${minutes}m`
     : minutes < 1_440
       ? `${Math.round(minutes / 60)}h`
       : `${Math.round(minutes / 1_440)}d`
+}
 
 type ChatSearchDialogProps = {
   open: boolean
@@ -45,7 +47,7 @@ export function ChatSearchDialog({
   const [query, setQuery] = useState("")
   const items = [...conversations].sort(
     (a, b) =>
-      Number(a.archived) - Number(b.archived) || a.minutesAgo - b.minutesAgo
+      Number(a.archived) - Number(b.archived) || b.updatedAt - a.updatedAt
   )
 
   return (
@@ -64,7 +66,7 @@ export function ChatSearchDialog({
         <Command
           items={items}
           itemToStringValue={(conversation) =>
-            `${conversation.title} ${conversation.prompts.join(" ")}`
+            `${conversation.title} ${conversation.messages.map((message) => (message.role === "user" ? message.text : "")).join(" ")}`
           }
           onValueChange={setQuery}
           value={query}
@@ -111,7 +113,7 @@ export function ChatSearchDialog({
                     )
                   )}
                   <span className="w-8 shrink-0 text-right text-xs text-muted-foreground tabular-nums">
-                    {timeAgo(conversation.minutesAgo)}
+                    {timeAgo(conversation.updatedAt)}
                   </span>
                 </CommandItem>
               )}

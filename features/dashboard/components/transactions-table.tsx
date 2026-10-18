@@ -1,6 +1,9 @@
 "use client"
 
+import { ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons"
+import { HugeiconsIcon } from "@hugeicons/react"
 import { useMemo, useState } from "react"
+import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Table,
@@ -13,6 +16,7 @@ import {
 import {
   intervalLabel,
   TRANSACTION_RANGE_DURATION,
+  TRANSACTIONS_PAGE_SIZE,
   type TransactionInterval,
   type TransactionRange,
 } from "@/features/dashboard/constants"
@@ -119,6 +123,7 @@ export const TransactionsTable = ({
   interval,
 }: TransactionsTableProps) => {
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set())
+  const [page, setPage] = useState(0)
 
   const filteredRows = useMemo(
     () =>
@@ -133,6 +138,11 @@ export const TransactionsTable = ({
     sort,
     toggleSort,
   } = useSortedRows(filteredRows, getters)
+
+  const pageCount = Math.max(1, Math.ceil(rows.length / TRANSACTIONS_PAGE_SIZE))
+  const currentPage = Math.min(page, pageCount - 1)
+  const firstRow = currentPage * TRANSACTIONS_PAGE_SIZE
+  const pageRows = rows.slice(firstRow, firstRow + TRANSACTIONS_PAGE_SIZE)
 
   const allSelected =
     rows.length > 0 && rows.every((row) => selected.has(row.symbol))
@@ -198,7 +208,7 @@ export const TransactionsTable = ({
               </TableCell>
             </TableRow>
           )}
-          {rows.map((row) => {
+          {pageRows.map((row) => {
             const isSelected = selected.has(row.symbol)
             const metrics = row.metrics[interval]
 
@@ -259,6 +269,47 @@ export const TransactionsTable = ({
           })}
         </TableBody>
       </Table>
+      {rows.length > TRANSACTIONS_PAGE_SIZE && (
+        <div className="flex items-center justify-between gap-3 border-t border-border px-4 py-2.5 text-xs text-muted-foreground">
+          <span>
+            Showing {firstRow + 1}–
+            {Math.min(firstRow + TRANSACTIONS_PAGE_SIZE, rows.length)} of{" "}
+            {rows.length}
+          </span>
+          <div className="flex items-center gap-1">
+            <Button
+              aria-label="Previous page"
+              disabled={currentPage === 0}
+              onClick={() => setPage(currentPage - 1)}
+              size="icon-sm"
+              variant="ghost"
+            >
+              <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
+            </Button>
+            {Array.from({ length: pageCount }, (_, index) => (
+              <Button
+                aria-current={index === currentPage ? "page" : undefined}
+                className="min-w-8 font-mono"
+                key={index}
+                onClick={() => setPage(index)}
+                size="sm"
+                variant={index === currentPage ? "secondary" : "ghost"}
+              >
+                {index + 1}
+              </Button>
+            ))}
+            <Button
+              aria-label="Next page"
+              disabled={currentPage === pageCount - 1}
+              onClick={() => setPage(currentPage + 1)}
+              size="icon-sm"
+              variant="ghost"
+            >
+              <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

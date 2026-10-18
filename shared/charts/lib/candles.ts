@@ -1,12 +1,8 @@
 import {
-  CANDLE_DURATION,
   CANDLE_ZOOM,
-  type CandleTimeframe,
   MOVING_AVERAGES,
   type MovingAverageKey,
 } from "@/shared/config/chart"
-import { createRandom } from "@/shared/lib/random"
-import { MARKET_NOW } from "@/shared/lib/time"
 
 export type Candle = {
   date: Date
@@ -17,7 +13,7 @@ export type Candle = {
   volume: number
 } & Partial<Record<MovingAverageKey, number>>
 
-const CANDLE_COUNT = CANDLE_ZOOM.max + 30
+export const CANDLE_COUNT = CANDLE_ZOOM.max + 30
 
 const movingAverage = (closes: number[], period: number) =>
   closes.map((_, index) => {
@@ -27,39 +23,16 @@ const movingAverage = (closes: number[], period: number) =>
     return sum / period
   })
 
-export const buildCandles = (
-  pair: string,
-  timeframe: CandleTimeframe,
-  lastPrice: number
-): Candle[] => {
-  const random = createRandom(`${pair}-${timeframe}`)
-  const step = CANDLE_DURATION[timeframe]
-  const volatility = lastPrice * 0.004
-
-  const closes: number[] = []
-  let price = lastPrice
-  for (let i = 0; i < CANDLE_COUNT; i++) {
-    closes.unshift(price)
-    price -= (random() - 0.5) * volatility * 2
-  }
-
+export const withMovingAverages = (candles: Candle[]): Candle[] => {
+  const closes = candles.map((candle) => candle.close)
   const averages = MOVING_AVERAGES.map(({ key, period }) => ({
     key,
     values: movingAverage(closes, period),
   }))
 
-  return closes.map((close, index) => {
-    const open = index === 0 ? close : closes[index - 1]
-    const wick = volatility * (0.3 + random())
-    const candle: Candle = {
-      date: new Date(MARKET_NOW - (CANDLE_COUNT - index) * step),
-      open,
-      close,
-      high: Math.max(open, close) + wick * random(),
-      low: Math.min(open, close) - wick * random(),
-      volume: 20 + random() * 80,
-    }
-    for (const { key, values } of averages) candle[key] = values[index]
-    return candle
+  return candles.map((candle, index) => {
+    const next: Candle = { ...candle }
+    for (const { key, values } of averages) next[key] = values[index]
+    return next
   })
 }

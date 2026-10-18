@@ -16,7 +16,7 @@ import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar"
 import type { AiSource } from "@/features/integrations"
 import type { WalletAsset } from "@/features/wallet"
 import { SOFT_TRANSITION } from "@/shared/lib/motion"
-import type { ChatAttachment, ChatMessage } from "../types"
+import type { ChatAttachment, ChatMessage, ChatTool } from "../types"
 import { AiEmptyState } from "./ai-empty-state"
 import { ChatComposer } from "./composer/chat-composer"
 import { ChatMessageView } from "./chat-message"
@@ -28,7 +28,11 @@ type AiChatProps = {
   planName: string
   messages: ChatMessage[]
   isStreaming: boolean
-  onSend: (prompt: string, attachments?: ChatAttachment[]) => void
+  onSend: (
+    prompt: string,
+    attachments?: ChatAttachment[],
+    tools?: ChatTool[]
+  ) => void
   onStop: () => void
   onReset: () => void
   onRegenerate: () => void
@@ -61,23 +65,25 @@ export function AiChat({
   useEffect(() => () => window.clearTimeout(typingTimer.current), [])
   const { isMobile } = useSidebar()
   const last = messages.at(-1)
-  const progress = last?.role === "assistant" ? last.revealed : 0
-  const followUps =
-    last?.role === "assistant" && last.status === "done" ? last.followUps : []
+  const progress = last?.role === "assistant" ? last.text.length : 0
 
   useEffect(() => {
     const node = scrollRef.current
-    if (node) node.scrollTo({ top: node.scrollHeight })
+    if (node && messages.length > 0) node.scrollTo({ top: node.scrollHeight })
   }, [messages.length, progress])
 
   const welcomeSlot = useRef<HTMLDivElement>(null)
   const [glideFrom, setGlideFrom] = useState<number | null>(null)
 
-  const send = (prompt: string, attachments?: ChatAttachment[]) => {
+  const send = (
+    prompt: string,
+    attachments?: ChatAttachment[],
+    tools?: ChatTool[]
+  ) => {
     if (messages.length === 0 && welcomeSlot.current) {
       setGlideFrom(welcomeSlot.current.getBoundingClientRect().top)
     }
-    onSend(prompt, attachments)
+    onSend(prompt, attachments, tools)
   }
 
   const composer = (
@@ -86,7 +92,6 @@ export function AiChat({
       draft={draft}
       planName={planName}
       sources={sources}
-      followUps={followUps}
       isStreaming={isStreaming}
       onSend={send}
       onStop={onStop}
@@ -95,7 +100,7 @@ export function AiChat({
   )
 
   return (
-    <section className="flex h-full min-w-0 flex-1 flex-col">
+    <section className="flex h-full min-h-0 min-w-0 flex-1 flex-col">
       <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border px-4">
         {isMobile && (
           <>
@@ -128,11 +133,10 @@ export function AiChat({
           <AiEmptyState
             composer={<div ref={welcomeSlot}>{composer}</div>}
             isTyping={isTyping}
-            onPick={send}
             sources={sources}
           />
         ) : (
-          <div className="mx-auto flex w-full max-w-3xl flex-col gap-2 px-4 py-6">
+          <div className="mx-auto flex w-full max-w-3xl flex-col gap-2 px-3 py-4 sm:px-4 sm:py-6">
             {messages.map((message) => (
               <ChatMessageView
                 key={message.id}
@@ -148,7 +152,7 @@ export function AiChat({
       </div>
 
       {messages.length > 0 && (
-        <div className="mx-auto w-full max-w-3xl px-4 pt-2 pb-4">
+        <div className="mx-auto w-full max-w-3xl shrink-0 px-3 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-4">
           <Glide from={glideFrom} onDone={setGlideFrom}>
             {composer}
           </Glide>

@@ -11,7 +11,9 @@ export type PortfolioHistoryRange = (typeof PORTFOLIO_HISTORY_RANGES)[number]
 
 export const PORTFOLIO_HISTORY_DEFAULT_RANGE: PortfolioHistoryRange = "1w"
 
-export const PORTFOLIO_TOTAL_VALUE = 56_647
+export const WATCHLIST_DEFAULT = ["BTC", "ETH"]
+
+export const WATCHLIST_CANDIDATE_COUNT = 6
 
 export const EXCHANGE_MODES = ["Swap", "Limit"] as const
 

@@ -3,14 +3,12 @@ import type {
   MARKET_MOVER_TABS,
   MARKET_SIGNALS,
   MARKET_STAT_IDS,
-  SECTOR_PERIODS,
 } from "../constants"
 
 export type MarketMoverTab = (typeof MARKET_MOVER_TABS)[number]
 export type MarketInsightSegment = (typeof MARKET_INSIGHT_SEGMENTS)[number]
 export type MarketSignal = (typeof MARKET_SIGNALS)[number]
 export type MarketStatId = (typeof MARKET_STAT_IDS)[number]
-export type SectorPeriod = (typeof SECTOR_PERIODS)[number]
 export type MarketTone = "up" | "down" | "flat"
 
 export type MarketTicker = {
@@ -36,7 +34,6 @@ export type SectorPerformance = {
   id: string
   name: string
   change24h: number
-  change30d: number
   marketCap: number
   leaders: string[]
 }

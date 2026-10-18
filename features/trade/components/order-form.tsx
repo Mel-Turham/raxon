@@ -29,7 +29,7 @@ import { SegmentedTabs } from "@/shared/components/molecules/segmented-tabs"
 import { CURRENCY_FORMAT } from "@/shared/lib/format"
 import { cn } from "@/shared/lib/utils"
 
-import { useTradePair } from "./trade-pair-context"
+import { useCurrentTicker } from "../hooks/use-trade-data"
 
 const FIELD_CONTROL =
   "h-11 border-border bg-muted text-sm md:text-sm dark:bg-muted"
@@ -346,13 +346,11 @@ const OrderFormFields = ({ ticker, account }: OrderFormFieldsProps) => {
 }
 
 type OrderFormProps = {
-  tickers: MarketTicker[]
   account: TradingAccount
 }
 
-export const OrderForm = ({ tickers, account }: OrderFormProps) => {
-  const { pair } = useTradePair()
-  const ticker = tickers.find((item) => item.pair === pair) ?? tickers[0]
+export const OrderForm = ({ account }: OrderFormProps) => {
+  const ticker = useCurrentTicker()
 
   return <OrderFormFields key={ticker.pair} account={account} ticker={ticker} />
 }

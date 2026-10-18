@@ -32,6 +32,7 @@ export type MarketTicker = {
   base: string
   quote: string
   lastPrice: number
+  change24h: number
   high24h: number
   low24h: number
   volumeBase24h: number
@@ -53,10 +54,7 @@ export type Order = {
   side: TradeSide
   status: OrderStatus
   entryPrice: number
-
-  margin: number
-
-  pnl: number
+  filled: number
   amount: number
 
   value: number

@@ -52,6 +52,7 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import { Kbd, KbdGroup } from "@/components/ui/kbd"
 import { toast } from "@/components/ui/toast"
@@ -260,6 +261,7 @@ export function AiSidebar({
 }: AiSidebarProps) {
   const router = useRouter()
   const pathname = usePathname()
+  const { setOpenMobile } = useSidebar()
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [showArchive, setShowArchive] = useState(false)
   const [upgradeDismissed, setUpgradeDismissed] = useUpgradeDismissed()
@@ -295,6 +297,10 @@ export function AiSidebar({
   )
 
   const mod = useSyncExternalStore(subscribe, isMac, () => false) ? "⌘" : "Ctrl"
+
+  useEffect(() => {
+    setOpenMobile(false)
+  }, [pathname, activeId, setOpenMobile])
 
   const startNewChat = () => {
     setShowArchive(false)
@@ -416,7 +422,7 @@ export function AiSidebar({
 
         {groups.map(
           ({ label, icon, items }) =>
-            (items.length > 0 || label !== "Pinned") && (
+            items.length > 0 && (
               <SidebarGroup
                 className="px-2 group-data-[collapsible=icon]:hidden"
                 key={label}
@@ -425,14 +431,7 @@ export function AiSidebar({
                   <HugeiconsIcon icon={icon} size={13} />
                   {label}
                 </SidebarGroupLabel>
-                <SidebarMenu>
-                  {items.map(renderRow)}
-                  {items.length === 0 && (
-                    <p className="px-2.5 py-2 text-xs text-muted-foreground">
-                      Nothing here yet.
-                    </p>
-                  )}
-                </SidebarMenu>
+                <SidebarMenu>{items.map(renderRow)}</SidebarMenu>
               </SidebarGroup>
             )
         )}

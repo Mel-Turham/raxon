@@ -36,7 +36,8 @@ import {
 } from "@/features/wallet"
 import { AnimatedNumber } from "@/shared/components/atoms/animated-number"
 import { LocalTime } from "@/shared/components/atoms/local-time"
-import { CHAIN_IDS, CHAINS, type ChainId, DEFAULT_CHAIN } from "@/shared/config"
+import { CURRENCY_FORMAT } from "@/shared/lib/format"
+import { BALANCE_VIEWS, type BalanceView } from "../constants"
 import { cn } from "@/shared/lib/utils"
 import { BALANCE_LAYOUT } from "../views/skeletons"
 
@@ -51,15 +52,8 @@ const BALANCE_ACTIONS = [
   },
 ] as const
 
-const ChainOption = ({ chain }: { chain: ChainId }) => {
-  const { label, icon: Icon } = CHAINS[chain]
-  return (
-    <>
-      <Icon variant="background" size={18} />
-      {label}
-    </>
-  )
-}
+const viewLabel = (view: BalanceView) =>
+  BALANCE_VIEWS.find(({ id }) => id === view)?.label
 
 type MyBalanceProps = {
   balance: Balance
@@ -73,7 +67,7 @@ export const MyBalance = ({
   walletAssets,
 }: MyBalanceProps) => {
   const router = useRouter()
-  const [chain, setChain] = useState<ChainId>(DEFAULT_CHAIN)
+  const [view, setView] = useState<BalanceView>("total")
   const [isRefreshing, startRefresh] = useTransition()
 
   return (
@@ -82,18 +76,18 @@ export const MyBalance = ({
         <CardTitle className="text-base">My Balance</CardTitle>
         <CardAction>
           <Select
-            value={chain}
-            onValueChange={(value) => setChain(value as ChainId)}
+            value={view}
+            onValueChange={(value) => setView(value as BalanceView)}
           >
-            <SelectTrigger className="h-7 gap-1.5 border-0 bg-muted py-0 pr-1.5 pl-1 text-xs data-[size=default]:h-7 dark:bg-muted dark:hover:bg-muted [&_svg:not([class*='size-'])]:size-3.5">
+            <SelectTrigger className="h-7 gap-1.5 border-0 bg-muted py-0 pr-1.5 pl-2.5 text-xs data-[size=default]:h-7 dark:bg-muted dark:hover:bg-muted [&_svg:not([class*='size-'])]:size-3.5">
               <SelectValue>
-                {(value: ChainId) => <ChainOption chain={value} />}
+                {(value: BalanceView) => viewLabel(value)}
               </SelectValue>
             </SelectTrigger>
             <SelectContent align="end">
-              {CHAIN_IDS.map((id) => (
+              {BALANCE_VIEWS.map(({ id, label }) => (
                 <SelectItem key={id} value={id}>
-                  <ChainOption chain={id} />
+                  {label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -105,7 +99,8 @@ export const MyBalance = ({
         <div className={BALANCE_LAYOUT.summary}>
           <AnimatedNumber
             className="font-mono text-[28px] leading-tight tracking-tight"
-            value={balance.byChain[chain]}
+            format={CURRENCY_FORMAT}
+            value={balance[view]}
           />
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <LocalTime value={balance.updatedAt} />

@@ -19,8 +19,26 @@ export const MARKET_STAT_IDS = [
 
 export const MARKET_ROW_LIMIT = 5
 
-export const LIVE_TICK_MS = 2_500
+export const LIVE_TICK_MS = 1_000
 
-export const LIVE_VOLATILITY = 0.0015
+export const TICKER_SYMBOLS = ["BTC", "ETH", "SOL", "XRP", "BNB", "DOGE"]
 
-export const SECTOR_PERIODS = ["24h", "30d"] as const
+export const INSIGHT_SYMBOLS = {
+  Spot: ["BTC", "ETH", "SOL", "BNB", "XRP"],
+  Perpetuals: ["BTC", "ETH", "SOL", "DOGE", "XRP"],
+  Stablecoins: ["USDC", "FDUSD", "USDE", "TUSD", "USD1"],
+  DeFi: ["UNI", "AAVE", "MKR", "LDO", "CRV"],
+  "Layer 2": ["ARB", "OP", "POL", "STRK", "IMX"],
+} as const
+
+export const SENTIMENT_SYMBOLS = ["BTC", "ETH", "SOL", "XRP", "DOGE"]
+
+export const MARKET_SECTORS = [
+  { id: "layer-1", name: "Layer 1" },
+  { id: "artificial-intelligence", name: "AI & Agents" },
+  { id: "meme-token", name: "Memecoins" },
+  { id: "decentralized-finance-defi", name: "DeFi" },
+  { id: "real-world-assets-rwa", name: "Real-world assets" },
+  { id: "layer-2", name: "Layer 2" },
+  { id: "gaming", name: "Gaming" },
+] as const

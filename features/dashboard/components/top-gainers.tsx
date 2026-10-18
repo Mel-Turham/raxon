@@ -13,10 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import {
-  DEFAULT_GAINER_GLYPH,
-  GAINER_GLYPHS,
-} from "@/features/dashboard/constants"
+import { GAINER_GLYPHS } from "@/features/dashboard/constants"
 import type { TopGainer } from "@/features/dashboard/types"
 import { AnimatedNumber } from "@/shared/components/atoms/animated-number"
 import { ListCard } from "@/shared/components/molecules/list-card"
@@ -84,7 +81,7 @@ export const TopGainers = ({
         </TableHeader>
         <TableBody>
           {sortedRows.map((gainer) => {
-            const glyph = GAINER_GLYPHS[gainer.symbol] ?? DEFAULT_GAINER_GLYPH
+            const glyph = GAINER_GLYPHS[gainer.momentum]
             const isUp = gainer.momentum === "up"
 
             return (

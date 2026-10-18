@@ -1,7 +1,8 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import dynamic from "next/dynamic"
+import { useMemo, useState } from "react"
 
 import { AnimatedNumber } from "@/shared/components/atoms/animated-number"
 import { ChangePill } from "@/shared/components/atoms/change-pill"
@@ -20,11 +21,10 @@ import {
   type PortfolioHistoryRange,
 } from "@/features/portfolio/constants"
 import { CURRENCY_FORMAT } from "@/shared/lib/format"
-import {
-  buildPortfolioHistory,
-  type PortfolioHistory as PortfolioHistoryData,
-} from "@/features/portfolio/helpers/portfolio-history"
+import { buildPortfolioHistory } from "@/features/portfolio/helpers/portfolio-history"
+import { cn } from "@/shared/lib/utils"
 
+import { portfolioQueries } from "../api/queries"
 import { HistoryChartSkeleton } from "../views/skeletons"
 
 const HistoryChart = dynamic(
@@ -32,20 +32,21 @@ const HistoryChart = dynamic(
   { ssr: false, loading: () => <HistoryChartSkeleton /> }
 )
 
-type PortfolioHistoryProps = {
-  initialHistory: PortfolioHistoryData
-}
-
-export const PortfolioHistory = ({ initialHistory }: PortfolioHistoryProps) => {
+export const PortfolioHistory = () => {
   const [range, setRange] = useState<PortfolioHistoryRange>(
     PORTFOLIO_HISTORY_DEFAULT_RANGE
   )
+  const {
+    data: points,
+    isPending,
+    isPlaceholderData,
+  } = useQuery({
+    ...portfolioQueries.history(range),
+    placeholderData: keepPreviousData,
+  })
   const history = useMemo(
-    () =>
-      range === PORTFOLIO_HISTORY_DEFAULT_RANGE
-        ? initialHistory
-        : buildPortfolioHistory(range),
-    [range, initialHistory]
+    () => buildPortfolioHistory(range, points ?? []),
+    [range, points]
   )
 
   return (
@@ -68,8 +69,21 @@ export const PortfolioHistory = ({ initialHistory }: PortfolioHistoryProps) => {
           />
         </CardAction>
       </CardHeader>
-      <CardContent className="flex min-h-72 flex-1 flex-col">
-        <HistoryChart history={history} revealSignature={range} />
+      <CardContent
+        className={cn(
+          "flex min-h-72 flex-1 flex-col transition-opacity",
+          isPlaceholderData && "opacity-60"
+        )}
+      >
+        {history.data.length > 1 ? (
+          <HistoryChart history={history} revealSignature={range} />
+        ) : isPending ? (
+          <HistoryChartSkeleton />
+        ) : (
+          <p className="flex min-h-60 flex-1 items-center justify-center text-sm text-muted-foreground">
+            No holdings yet. Deposit funds to start tracking your portfolio.
+          </p>
+        )}
       </CardContent>
     </Card>
   )

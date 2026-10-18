@@ -2,34 +2,74 @@ import {
   getBalance,
   getKpis,
   getMarketLeaders,
-  getPortfolioSeries,
+  getPortfolioValues,
   getTopAssets,
   getTopGainers,
   getTransactions,
 } from "@/features/dashboard/api/dashboard"
+import { Prefetched } from "@/shared/providers/prefetch"
+import { PORTFOLIO_DEFAULT_RANGE } from "../constants"
 import { getTransferContacts } from "@/features/wallet/api/transfer"
 import { getWalletAssets } from "@/features/wallet/api/wallet"
 
-import { KpiCards } from "../components/kpi-cards"
-import { MarketLeaders } from "../components/market-leaders"
+import { dashboardQueries } from "../api/queries"
 import { MyBalance } from "../components/my-balance"
 import { PortfolioValue } from "../components/portfolio-value"
-import { RecentTransactions } from "../components/recent-transactions"
-import { TopAssets } from "../components/top-assets"
-import { TopGainers } from "../components/top-gainers"
+import {
+  LiveKpiCards,
+  LiveMarketLeaders,
+  LiveRecentTransactions,
+  LiveTopAssets,
+  LiveTopGainers,
+} from "./connected"
 
-export const KpiSection = async () => <KpiCards items={await getKpis()} />
-
-export const MarketLeadersSection = async () => (
-  <MarketLeaders data={await getMarketLeaders()} />
+export const KpiSection = () => (
+  <Prefetched
+    prefetch={(client) => [
+      client.prefetchQuery({ ...dashboardQueries.kpis(), queryFn: getKpis }),
+    ]}
+  >
+    <LiveKpiCards />
+  </Prefetched>
 )
 
-export const PortfolioSection = async () => (
-  <PortfolioValue initialSeries={await getPortfolioSeries()} />
+export const MarketLeadersSection = () => (
+  <Prefetched
+    prefetch={(client) => [
+      client.prefetchQuery({
+        ...dashboardQueries.leaders(),
+        queryFn: getMarketLeaders,
+      }),
+    ]}
+  >
+    <LiveMarketLeaders />
+  </Prefetched>
 )
 
-export const TransactionsSection = async () => (
-  <RecentTransactions transactions={await getTransactions()} />
+export const PortfolioSection = () => (
+  <Prefetched
+    prefetch={(client) => [
+      client.prefetchQuery({
+        ...dashboardQueries.portfolio(PORTFOLIO_DEFAULT_RANGE),
+        queryFn: () => getPortfolioValues(PORTFOLIO_DEFAULT_RANGE),
+      }),
+    ]}
+  >
+    <PortfolioValue />
+  </Prefetched>
+)
+
+export const TransactionsSection = () => (
+  <Prefetched
+    prefetch={(client) => [
+      client.prefetchQuery({
+        ...dashboardQueries.transactions(),
+        queryFn: getTransactions,
+      }),
+    ]}
+  >
+    <LiveRecentTransactions />
+  </Prefetched>
 )
 
 export const BalanceSection = async () => {
@@ -48,12 +88,28 @@ export const BalanceSection = async () => {
   )
 }
 
-export const TopAssetsSection = async () => (
-  <TopAssets assets={await getTopAssets()} />
+export const TopAssetsSection = () => (
+  <Prefetched
+    prefetch={(client) => [
+      client.prefetchQuery({
+        ...dashboardQueries.topAssets(),
+        queryFn: getTopAssets,
+      }),
+    ]}
+  >
+    <LiveTopAssets />
+  </Prefetched>
 )
 
-export const TopGainersSection = async ({
-  className,
-}: {
-  className?: string
-}) => <TopGainers className={className} gainers={await getTopGainers()} />
+export const TopGainersSection = ({ className }: { className?: string }) => (
+  <Prefetched
+    prefetch={(client) => [
+      client.prefetchQuery({
+        ...dashboardQueries.topGainers(),
+        queryFn: getTopGainers,
+      }),
+    ]}
+  >
+    <LiveTopGainers className={className} />
+  </Prefetched>
+)

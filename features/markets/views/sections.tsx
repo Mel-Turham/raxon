@@ -1,3 +1,5 @@
+import { Prefetched } from "@/shared/providers/prefetch"
+
 import {
   getMarketInsights,
   getMarketMovers,
@@ -7,42 +9,101 @@ import {
   getMarketTickers,
   getSectorPerformance,
 } from "../api/markets"
-import { MarketInsights } from "../components/market-insights"
-import { MarketNews } from "../components/market-news"
-import { MarketSentiment } from "../components/market-sentiment"
-import { MarketStatCard } from "../components/market-stat-card"
-import { SectorPerformance } from "../components/sector-performance"
-import { TickerStrip } from "../components/ticker-strip"
-import { TopMovers } from "../components/top-movers"
+import { marketQueries } from "../api/queries"
+import {
+  LiveMarketInsights,
+  LiveMarketNews,
+  LiveMarketSentiment,
+  LiveMarketStats,
+  LiveSectorPerformance,
+  LiveTickerStrip,
+  LiveTopMovers,
+} from "./connected"
 
-export const TickerSection = async () => (
-  <TickerStrip tickers={await getMarketTickers()} />
+export const TickerSection = () => (
+  <Prefetched
+    prefetch={(client) => [
+      client.prefetchQuery({
+        ...marketQueries.tickers(),
+        queryFn: getMarketTickers,
+      }),
+    ]}
+  >
+    <LiveTickerStrip />
+  </Prefetched>
 )
 
-export const MoversSection = async () => (
-  <TopMovers movers={await getMarketMovers()} />
+export const MoversSection = () => (
+  <Prefetched
+    prefetch={(client) => [
+      client.prefetchQuery({
+        ...marketQueries.movers(),
+        queryFn: getMarketMovers,
+      }),
+    ]}
+  >
+    <LiveTopMovers />
+  </Prefetched>
 )
 
-export const SectorsSection = async () => (
-  <SectorPerformance sectors={await getSectorPerformance()} />
+export const SectorsSection = () => (
+  <Prefetched
+    prefetch={(client) => [
+      client.prefetchQuery({
+        ...marketQueries.sectors(),
+        queryFn: getSectorPerformance,
+      }),
+    ]}
+  >
+    <LiveSectorPerformance />
+  </Prefetched>
 )
 
-export const NewsSection = async () => (
-  <MarketNews news={await getMarketNews()} />
+export const NewsSection = () => (
+  <Prefetched
+    prefetch={(client) => [
+      client.prefetchQuery({ ...marketQueries.news(), queryFn: getMarketNews }),
+    ]}
+  >
+    <LiveMarketNews />
+  </Prefetched>
 )
 
-export const InsightsSection = async () => (
-  <MarketInsights insights={await getMarketInsights()} />
+export const InsightsSection = () => (
+  <Prefetched
+    prefetch={(client) => [
+      client.prefetchQuery({
+        ...marketQueries.insights(),
+        queryFn: getMarketInsights,
+      }),
+    ]}
+  >
+    <LiveMarketInsights />
+  </Prefetched>
 )
 
-export const SentimentSection = async () => (
-  <MarketSentiment sentiment={await getMarketSentiment()} />
+export const SentimentSection = () => (
+  <Prefetched
+    prefetch={(client) => [
+      client.prefetchQuery({
+        ...marketQueries.sentiment(),
+        queryFn: getMarketSentiment,
+      }),
+    ]}
+  >
+    <LiveMarketSentiment />
+  </Prefetched>
 )
 
-export const StatsSection = async () => (
-  <>
-    {(await getMarketStats()).map((stat) => (
-      <MarketStatCard key={stat.id} stat={stat} />
-    ))}
-  </>
+export const StatsSection = () => (
+  <Prefetched
+    prefetch={(client) => [
+      client.prefetchQuery({
+        ...marketQueries.stats(),
+        queryFn: getMarketStats,
+      }),
+    ]}
+  >
+    <LiveMarketStats />
+  </Prefetched>
 )

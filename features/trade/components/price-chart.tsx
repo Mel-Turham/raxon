@@ -11,6 +11,7 @@ import type { Candle } from "@/shared/charts/lib/candles"
 
 import {
   CandleTooltip,
+  LastPriceLine,
   MovingAverages,
   VolumeBars,
 } from "@/features/trade/components/chart-layers"
@@ -68,6 +69,7 @@ export const PriceChart = ({
       positiveFill="var(--chart-candle-up)"
     />
     {showIndicators && <MovingAverages />}
+    <LastPriceLine />
     <YAxis
       formatValue={(value) => axisFormatter.format(value)}
       numTicks={6}

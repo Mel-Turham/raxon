@@ -9,8 +9,8 @@ export const CANDLE_TIMEFRAMES = [
   "5m",
   "15m",
   "30m",
-  "45m",
   "1h",
+  "4h",
   "1D",
   "1W",
 ] as const
@@ -24,8 +24,8 @@ export const CANDLE_DURATION: Record<CandleTimeframe, number> = {
   "5m": 5 * MINUTE,
   "15m": 15 * MINUTE,
   "30m": 30 * MINUTE,
-  "45m": 45 * MINUTE,
   "1h": HOUR,
+  "4h": 4 * HOUR,
   "1D": DAY,
   "1W": 7 * DAY,
 }

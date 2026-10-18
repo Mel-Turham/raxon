@@ -16,19 +16,19 @@ export const PORTFOLIO_METRICS: Record<
     icon: Coins01Icon,
     accent: "var(--primary)",
   },
-  marginUsage: {
-    label: "Margin Usage",
-    icon: PercentSquareIcon,
-    accent: "var(--token-btc)",
-  },
   buyingPower: {
     label: "Buying Power",
     icon: ShoppingCart01Icon,
-    accent: "var(--destructive)",
-  },
-  freeCollateral: {
-    label: "Free Collateral",
-    icon: SafeIcon,
     accent: "var(--success)",
+  },
+  inOrders: {
+    label: "In Orders",
+    icon: SafeIcon,
+    accent: "var(--token-btc)",
+  },
+  topHolding: {
+    label: "Top Holding",
+    icon: PercentSquareIcon,
+    accent: "var(--destructive)",
   },
 }

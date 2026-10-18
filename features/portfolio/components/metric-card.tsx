@@ -28,8 +28,7 @@ export const MetricCard = ({ metric }: { metric: PortfolioMetric }) => {
 
   return (
     <Card
-      className="gap-4"
-
+      className="@container/metric gap-4"
       style={{ "--metric-accent": accent } as CSSProperties}
     >
       <CardHeader className="items-center">
@@ -43,9 +42,9 @@ export const MetricCard = ({ metric }: { metric: PortfolioMetric }) => {
       </CardHeader>
 
       <CardContent className="flex flex-col gap-4">
-        <div className="flex items-end justify-between gap-3">
+        <div className="flex flex-col gap-2 @[16rem]/metric:flex-row @[16rem]/metric:items-end @[16rem]/metric:justify-between @[16rem]/metric:gap-3">
           <div className="flex min-w-0 flex-col gap-1">
-            <span className="font-mono text-[11px] text-muted-foreground">
+            <span className="truncate font-mono text-[11px] text-muted-foreground">
               <AnimatedNumber
                 format={ASSET_FORMAT}
                 suffix={` (${metric.asset})`}
@@ -53,13 +52,13 @@ export const MetricCard = ({ metric }: { metric: PortfolioMetric }) => {
               />
             </span>
             <AnimatedNumber
-              className="font-mono text-2xl tracking-tight tabular-nums"
+              className="font-mono text-xl tracking-tight tabular-nums @[16rem]/metric:text-2xl"
               format={VALUE_FORMAT}
               value={metric.value}
             />
           </div>
           <LazySparkline
-            className="h-10 w-24"
+            className="h-8 w-full shrink-0 @[16rem]/metric:h-10 @[16rem]/metric:w-24"
             color="var(--metric-accent)"
             seed={metric.key}
             trend={metric.change}
@@ -71,7 +70,7 @@ export const MetricCard = ({ metric }: { metric: PortfolioMetric }) => {
           value={metric.ratio}
         >
           <ProgressLabel className="text-[11px] text-muted-foreground">
-            Account limit used
+            Share of portfolio
           </ProgressLabel>
           <ProgressValue className="text-[11px] text-foreground/90" />
         </Progress>

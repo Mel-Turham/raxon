@@ -7,7 +7,7 @@ export type WatchlistItem = {
 }
 
 export type PortfolioMetricKey =
-  "portfolioValue" | "marginUsage" | "buyingPower" | "freeCollateral"
+  "portfolioValue" | "buyingPower" | "inOrders" | "topHolding"
 
 export type PortfolioMetric = {
   key: PortfolioMetricKey
@@ -20,6 +20,12 @@ export type PortfolioMetric = {
   ratio: number
 
   change: number
+}
+
+export type HistoryValuePoint = {
+  time: number
+  value: number
+  activity: number
 }
 
 export type WalletHolding = {

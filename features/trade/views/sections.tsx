@@ -1,43 +1,55 @@
 import {
   getActiveOrders,
-  getMarketTickers,
-  getMarketTrades,
-  getOrderBook,
   getOrderHistory,
   getRunningTrades,
   getTradingAccount,
 } from "@/features/trade/api/trade"
+import { Prefetched } from "@/shared/providers/prefetch"
 
+import { tradeQueries } from "../api/queries"
 import { MarketChart } from "../components/market-chart"
 import { OrderBook } from "../components/order-book"
 import { OrderForm } from "../components/order-form"
 import { OrdersCard } from "../components/orders-card"
 import { RunningTrades } from "../components/running-trades"
+import { DEFAULT_CANDLE_TIMEFRAME } from "../constants"
 
-export const OrderBookSection = async () => {
-  const [book, trades] = await Promise.all([getOrderBook(), getMarketTrades()])
-  return <OrderBook book={book} trades={trades} />
-}
+export const OrderBookSection = ({ pair }: { pair: string }) => (
+  <Prefetched
+    prefetch={(client) => [
+      client.prefetchQuery(tradeQueries.orderBook(pair)),
+      client.prefetchQuery(tradeQueries.trades(pair)),
+    ]}
+  >
+    <OrderBook />
+  </Prefetched>
+)
 
 export const RunningTradesSection = async () => (
   <RunningTrades trades={await getRunningTrades()} />
 )
 
-export const MarketChartSection = async () => {
-  const [tickers, book] = await Promise.all([
-    getMarketTickers(),
-    getOrderBook(),
-  ])
-  return <MarketChart book={book} tickers={tickers} />
-}
+export const MarketChartSection = ({ pair }: { pair: string }) => (
+  <Prefetched
+    prefetch={(client) => [
+      client.prefetchQuery(tradeQueries.tickers()),
+      client.prefetchQuery(tradeQueries.orderBook(pair)),
+      client.prefetchQuery(
+        tradeQueries.candles(pair, DEFAULT_CANDLE_TIMEFRAME)
+      ),
+    ]}
+  >
+    <MarketChart />
+  </Prefetched>
+)
 
-export const OrderFormSection = async () => {
-  const [tickers, account] = await Promise.all([
-    getMarketTickers(),
-    getTradingAccount(),
-  ])
-  return <OrderForm account={account} tickers={tickers} />
-}
+export const OrderFormSection = async () => (
+  <Prefetched
+    prefetch={(client) => [client.prefetchQuery(tradeQueries.tickers())]}
+  >
+    <OrderForm account={await getTradingAccount()} />
+  </Prefetched>
+)
 
 export const OrdersSection = async () => {
   const [active, history] = await Promise.all([

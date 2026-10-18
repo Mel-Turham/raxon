@@ -14,7 +14,7 @@ import { TrendBadge } from "@/shared/components/atoms/trend-badge"
 import { withKeys } from "@/shared/lib/keys"
 import { EASE_SOFT } from "@/shared/lib/motion"
 import { cn } from "@/shared/lib/utils"
-import { sentimentZone } from "../helpers/replies"
+import { sentimentZone } from "../helpers/sentiment"
 import type {
   AiSignal,
   MarketSentiment,

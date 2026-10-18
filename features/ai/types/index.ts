@@ -29,8 +29,8 @@ export type AiSignal = {
 export type AiConversation = {
   id: string
   title: string
-  prompts: string[]
-  minutesAgo: number
+  messages: ChatMessage[]
+  updatedAt: number
   archived: boolean
   pinned: boolean
   strategy: string | null
@@ -43,33 +43,11 @@ export type AiPlan = {
   discount: number
 }
 
-export type AiAccount = {
-  uid: string
-  kycLevel: number
-  referralBonus: number
-  language: string
-}
-
 export type AiInsights = {
-  plan: AiPlan
-  account: AiAccount
   sentiment: MarketSentiment
   health: PortfolioHealth
   signals: AiSignal[]
-  conversations: AiConversation[]
 }
-
-export type AiAssetQuote = {
-  symbol: string
-  name: string
-  price: number
-  change: number
-}
-
-export type AiBlock =
-  | { type: "text"; text: string }
-  | { type: "assets"; items: AiAssetQuote[] }
-  | { type: "allocation"; items: { symbol: string; share: number }[] }
 
 export type ChatTool = "reason" | "scan" | "web"
 
@@ -80,12 +58,6 @@ export type ChatAttachment = {
   meta: string
   url?: string
   symbol?: string
-}
-
-export type AiReply = {
-  blocks: AiBlock[]
-  reasoning: string[]
-  followUps: string[]
 }
 
 export type ChatMessage =
@@ -100,12 +72,10 @@ export type ChatMessage =
       id: string
       role: "assistant"
       createdAt: number
-      blocks: AiBlock[]
+      text: string
       reasoning: string[]
       stepsDone: number
       thoughtMs: number
-      followUps: string[]
-      revealed: number
       status: "thinking" | "streaming" | "done" | "stopped"
       sources: AiSource[]
       nudge?: "connect-exchange"
