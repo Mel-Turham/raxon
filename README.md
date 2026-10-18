@@ -1,37 +1,66 @@
 # Raxon
 
-Raxon is a crypto-market and portfolio dashboard built with the Next.js App Router. It brings market discovery, portfolio monitoring, notifications, and trading workflows into a single application.
+Raxon is an open-source crypto trading and portfolio app built with the Next.js App Router. It combines live market data, a real-time trading view, portfolio analytics, and an AI assistant in one interface.
 
-The current implementation is a **demonstration frontend**. Market and portfolio data are mocked, authentication is simulated, and trading operations do not execute against an exchange.
+Live demo: [raxon.melturham.me](https://raxon.melturham.me)
+
+## What is real and what is simulated
+
+| Real                                                                | Simulated                                                 |
+| ------------------------------------------------------------------- | --------------------------------------------------------- |
+| Market prices, movers, sectors, stats and news                      | Sign-in and sign-up (nothing is stored)                   |
+| Trade order book, trades, ticker and candles, streamed in real time | Account balances, trade history and orders (demo account) |
+| Fear & Greed index and long/short sentiment                         | Placing orders, deposits, withdrawals, swaps, transfers   |
+| Raxon AI answers, grounded in live market data                      | Integrations, automations, notifications and the OTC desk |
+| Portfolio and analytics charts, valued at real historical prices    |                                                           |
+
+The demo account holds a fixed portfolio and a year of deterministic trades executed at real daily Binance prices, so every page shows consistent figures without a real exchange account.
 
 ## Product surface
 
-| Route         | Capability                                                         |
-| ------------- | ------------------------------------------------------------------ |
-| `/`           | Sign-in demonstration                                              |
-| `/register`   | Account creation demonstration                                     |
-| `/dashboard`  | Portfolio summary, market leaders, gainers, and recent activity    |
-| `/markets`    | Market asset discovery and new listings                            |
-| `/analytics`  | Portfolio performance, allocation, and trading analytics           |
-| `/otc`        | Request indicative quotes for large over-the-counter trades        |
-| `/portfolio`  | Holdings, history, watchlist, converter, and simulated exchange UI |
-| `/trade`      | Market chart, order book, orders, and simulated trade activity     |
-| Unknown route | Custom 404 page                                                    |
+| Route                          | Capability                                                          |
+| ------------------------------ | ------------------------------------------------------------------- |
+| `/`                            | Sign-in demo, with a one-time notice explaining the demo            |
+| `/register`                    | Sign-up demo                                                        |
+| `/dashboard`                   | Balance, portfolio value, KPIs, market leaders, gainers, top assets |
+| `/markets`                     | Live tickers, movers, sectors, news, insights, sentiment and stats  |
+| `/trade`                       | Real-time chart, order book, trades, order form and orders          |
+| `/portfolio`                   | Metrics, value history, holdings, watchlist and converter           |
+| `/analytics`                   | Realized P&L, performance, allocation and trade statistics          |
+| `/otc`                         | Indicative quotes for large trades                                  |
+| `/ai`                          | Raxon AI chat with live market insights                             |
+| `/ai/integrations`             | Integration catalog                                                 |
+| `/ai/integrations/automations` | Alert and signal automations                                        |
 
-The application UI, document language, and route metadata are in English.
+## Data sources
+
+All providers below have a free tier and only Groq needs a key.
+
+| Provider                                                                         | Used for                                                         | Key      |
+| -------------------------------------------------------------------------------- | ---------------------------------------------------------------- | -------- |
+| [CoinGecko](https://www.coingecko.com/en/api)                                    | Prices, market caps, movers, sectors, global stats               | Optional |
+| [Binance public data](https://developers.binance.com/docs/binance-spot-api-docs) | Trade REST and WebSocket streams, historical prices, spot quotes | No       |
+| Binance Futures                                                                  | Perpetual quotes and long/short sentiment                        | No       |
+| [Alternative.me](https://alternative.me/crypto/fear-and-greed-index/)            | Fear & Greed index                                               | No       |
+| CoinDesk, Cointelegraph, Decrypt RSS                                             | Market news                                                      | No       |
+| [Groq](https://console.groq.com)                                                 | AI chat, AI signals and news sentiment                           | Required |
+
+Raxon AI falls back through `gpt-oss-120b`, `gpt-oss-20b` and `qwen3.8-27b` when a model is retired, rate limited or unavailable, and tells the user when the free quota is used up.
 
 ## Technology
 
-| Area                 | Stack                                    |
-| -------------------- | ---------------------------------------- |
-| Framework            | Next.js 16 App Router                    |
-| UI runtime           | React 19, TypeScript strict mode         |
-| Styling              | Tailwind CSS 4                           |
-| UI primitives        | Base UI and shadcn-compatible components |
-| Forms and validation | React Hook Form, Zod                     |
-| Visualization        | Visx, D3                                 |
-| Icons                | Hugeicons                                |
-| Package manager      | Bun (`bun.lock`)                         |
+| Area                 | Stack                            |
+| -------------------- | -------------------------------- |
+| Framework            | Next.js 16 App Router            |
+| UI runtime           | React 19, TypeScript strict mode |
+| Data fetching        | TanStack React Query, axios      |
+| Styling              | Tailwind CSS 4                   |
+| UI primitives        | Base UI and shadcn components    |
+| Forms and validation | React Hook Form, Zod             |
+| Visualization        | Visx, D3                         |
+| AI rendering         | react-markdown, remark-gfm       |
+| Icons                | Hugeicons                        |
+| Package manager      | Bun (`bun.lock`)                 |
 
 ## Local development
 
@@ -39,17 +68,19 @@ The application UI, document language, and route metadata are in English.
 
 - Node.js 20.9 or later
 - Bun
+- A free [Groq API key](https://console.groq.com/keys) for Raxon AI
 
 ### Install and run
 
 ```bash
 bun install
+cp .env.example .env
 bun run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Set `GROQ_API_KEY` in `.env`, then open [http://localhost:3000](http://localhost:3000).
 
-The sign-in demonstration defaults to `demo@raxon.app` / `DemoPass&2025`. These are public demo values, not credentials. Do not use this flow for production authentication.
+The sign-in form is pre-filled with the public demo credentials `demo@raxon.app` / `DemoPass&2025`. They are not real credentials.
 
 ### Commands
 
@@ -62,101 +93,89 @@ The sign-in demonstration defaults to `demo@raxon.app` / `DemoPass&2025`. These 
 | `bun run typecheck` | Run TypeScript without emitting files.             |
 | `bun run format`    | Format all `*.ts` and `*.tsx` files with Prettier. |
 
-There is currently no automated test script.
+## Configuration
+
+Every variable is listed in [`.env.example`](./.env.example). They are validated at startup by `shared/config/env.ts` (public) and `shared/config/env.server.ts` (server only); the app refuses to start and names the missing variable when one is absent.
+
+| Variable                      | Purpose                                                   |
+| ----------------------------- | --------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`        | Canonical URL for metadata, Open Graph and sitemap        |
+| `NEXT_PUBLIC_TEST_EMAIL`      | Demo sign-in email                                        |
+| `NEXT_PUBLIC_TEST_PASSWORD`   | Demo sign-in password                                     |
+| `NEXT_PUBLIC_BINANCE_API_URL` | Binance public REST API (also called from the browser)    |
+| `NEXT_PUBLIC_BINANCE_WS_URL`  | Binance public WebSocket streams                          |
+| `BINANCE_FUTURES_API_URL`     | Binance Futures API for perpetuals and sentiment          |
+| `COINGECKO_API_URL`           | CoinGecko API                                             |
+| `COINGECKO_API_KEY`           | Optional CoinGecko demo key for a higher rate limit       |
+| `FEAR_GREED_API_URL`          | Fear & Greed API                                          |
+| `NEWS_RSS_FEEDS`              | Comma-separated `Source\|url` news feeds                  |
+| `GROQ_API_URL`                | Groq OpenAI-compatible API                                |
+| `GROQ_API_KEY`                | Groq API key                                              |
+| `GROQ_MODEL`                  | Optional preferred model, tried before the fallback chain |
+| `MOCK_API_LATENCY_MS`         | Delay for simulated features, `800` in development        |
+
+`NEXT_PUBLIC_*` values are bundled into client code, so they must never hold secrets.
+
+## Deployment
+
+The app deploys to Vercel as is. `vercel.json` pins functions to `fra1` (Frankfurt) because Binance Futures rejects requests from US regions. Set the variables from `.env.example` in the Vercel project, and mark `GROQ_API_KEY` as sensitive.
 
 ## Architecture
 
-The application is organized around product capabilities rather than technical layers. A feature owns its UI, data access, domain types, constants, mocks, and actions where applicable. Cross-feature primitives and utilities live in `shared/`.
+The code is organized by product capability. Each feature owns its UI, data access, types, constants and actions; cross-feature infrastructure lives in `shared/`.
 
 ```text
-app/                         Next.js routing and composition root
-├── (auth)/                  Sign-in and registration routes
+app/                         Routing and composition root
+├── (auth)/                  Sign-in and registration
 ├── (dashboard)/             Application shell and product routes
-├── layout.tsx               Root document, fonts, and default metadata
-├── providers.tsx            Client-side global providers
-└── not-found.tsx            Application 404 UI
+├── (ai-assistant)/          Raxon AI routes
+├── api/                     Route handlers for client refetches and AI chat
+├── layout.tsx               Root document, fonts and metadata
+└── providers.tsx            React Query, theme and tooltip providers
 
 features/                    Product capabilities
-├── app-shell/               Navigation and application shell
-├── auth/                    Demo authentication flows
-├── analytics/               Portfolio and trading analytics
-├── otc/                     OTC desk and quote workflow
-├── dashboard/               Summary and recent activity
-├── markets/                 Market discovery
-├── notifications/           Notification UI and actions
-├── portfolio/               Holdings and portfolio tools
-└── trade/                   Charts and trading workflows
+├── accounts/  ai/  analytics/  app-shell/  auth/  dashboard/
+├── integrations/  markets/  notifications/  otc/  portfolio/
+└── search/  trade/  wallet/
 
 shared/                      Cross-feature infrastructure and UI
-├── api/                     Server-side request utility
-├── charts/                  Reusable chart primitives and behavior
+├── account/                 Demo account source, valuation and FIFO P&L
+├── api/                     HTTP clients for each provider
+├── charts/                  Reusable chart primitives
 ├── components/              Shared atoms and molecules
-├── config/                  Application-wide configuration
-├── hooks/                   Shared React hooks
+├── config/                  Configuration and validated env
+├── hooks/                   Shared hooks, including the Binance stream
 ├── lib/                     General-purpose utilities
-├── providers/               Shared providers
-└── types/                   Cross-feature types
+└── providers/               Query client and server prefetch
 
-components/ui/               UI primitives retained for the shadcn CLI
-docs/                        Architecture decisions and supporting docs
+components/ui/               shadcn primitives
 ```
 
-### Composition and ownership
-
-`app/` is the composition root. Route files own URL mapping and route metadata, then render a feature's public view. They should not own domain behavior or import feature internals.
+### Data flow
 
 ```text
-Route → public feature API → feature view → feature sections/components
-                            ↘ shared primitives and utilities
+Server component ── prefetch (React Query) ──► HydrationBoundary ──► client component
+                                                                         │
+             /api route handler ◄── axios refetch (keys stay server-side) ┘
+Binance WebSocket ──► React Query cache (Trade) / live price context (Markets)
 ```
 
-Feature internals remain private by default. Each feature's root `index.ts` is its external API; internal `views/`, `mocks/`, helpers, and implementation details should not be imported by other features or routes.
+- Server sections prefetch with direct loaders and hand the cache to the client through `HydrationBoundary`.
+- Client components read the same query keys and refetch through `app/api/*`, so provider keys never reach the browser.
+- Upstream responses are cached with Next's data cache through axios' fetch adapter.
 
 ### Dependency rules
 
 ```text
-app      → public feature APIs, shared
-features → own internals, shared, public APIs of other features when needed
+app      → public feature APIs, feature server loaders (route handlers), shared
+features → own internals, shared, public APIs of other features
 shared   → shared code and external packages; never features
 ```
 
-- Cross-feature dependencies must use the target feature's public entry point.
-- Features must not depend on `app/`.
-- `shared/` must not depend on features.
-- Route files must not reach into feature internals.
-- ESLint currently enforces these boundaries for the configured import patterns.
-
-The main TypeScript aliases are `@/*`, `@shared/*`, and `@features/*`.
-
-## Data and runtime model
-
-Feature `api/` modules currently provide server-side data functions backed by feature-local mock datasets. `shared/api/request.ts` centralizes the simulated request delay. `MOCK_API_LATENCY_MS` overrides the delay; development defaults to 800 ms, and other environments default to no delay.
-
-This is an integration seam, not a production data layer. Replacing the mocks requires explicit API contracts, failure handling, authorization, cache policy, and observability. The exchange and order flows are simulations and do not submit real transactions.
-
-## Configuration and security notes
-
-| Variable                    | Purpose                                  | Default                             |
-| --------------------------- | ---------------------------------------- | ----------------------------------- |
-| `NEXT_PUBLIC_TEST_EMAIL`    | Demo sign-in email                       | `demo@raxon.app`                    |
-| `NEXT_PUBLIC_TEST_PASSWORD` | Demo sign-in password                    | `DemoPass&2025`                     |
-| `MOCK_API_LATENCY_MS`       | Simulated request delay, in milliseconds | `800` in development; `0` otherwise |
-
-The `NEXT_PUBLIC_*` values are bundled into client-side code by Next.js. They are intentionally non-secret demo values and must never contain production credentials. `.env.example` documents the demo configuration; the application also has defaults when these variables are absent.
-
-`next.config.ts` configures response security headers. Production deployment should still validate those headers against the hosting platform, domain setup, and the application's actual integration requirements.
+The main TypeScript aliases are `@/*`, `@shared/*` and `@features/*`.
 
 ## Engineering status
 
-- TypeScript strict mode is enabled.
-- ESLint includes Next.js rules and import-boundary rules for `app`, `features`, and `shared`.
-- The current lint run has no errors and reports four React Hooks warnings in three files; details are tracked in [CLEAN_CODE_REVIEW.md](./CLEAN_CODE_REVIEW.md).
-- Typecheck and lint scripts are available.
-- No automated test suite or test command is configured.
-- CI enforcement, `dependency-cruiser`, and `knip` are still outstanding architecture work.
-
-## Architecture references
-
-- [Architecture plan](./ARCHITECTURE_PLAN.md)
-- [ADR 0001: Feature-driven architecture](./docs/adr/0001-feature-driven-architecture.md)
-- [Clean code review](./CLEAN_CODE_REVIEW.md)
+- TypeScript strict mode is enabled and `bun run typecheck` passes.
+- `bun run lint` currently fails to start: `typescript-eslint` does not support TypeScript 7 yet.
+- There is no automated test suite yet.
