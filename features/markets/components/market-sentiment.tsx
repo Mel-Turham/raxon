@@ -31,6 +31,11 @@ export const MarketSentiment = ({
     }
     title="Market Sentiment"
   >
+    {sentiment.items.length === 0 && (
+      <p className="flex flex-1 items-center justify-center py-10 text-sm text-muted-foreground">
+        Sentiment data is unavailable right now.
+      </p>
+    )}
     <ul className="flex flex-1 flex-col">
       {sentiment.items.map((item) => (
         <li

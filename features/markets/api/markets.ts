@@ -161,7 +161,7 @@ const getPerpetualQuotes = async (bases: readonly string[]) => {
 export const getMarketInsights = async (): Promise<MarketInsights> => {
   const [spot, perpetuals, stablecoins, defi, layer2] = await Promise.all([
     getSpotQuotes(INSIGHT_SYMBOLS.Spot),
-    getPerpetualQuotes(INSIGHT_SYMBOLS.Perpetuals),
+    getPerpetualQuotes(INSIGHT_SYMBOLS.Perpetuals).catch(() => []),
     getSpotQuotes(INSIGHT_SYMBOLS.Stablecoins),
     getSpotQuotes(INSIGHT_SYMBOLS.DeFi),
     getSpotQuotes(INSIGHT_SYMBOLS["Layer 2"]),
@@ -194,7 +194,7 @@ export const getMarketSentiment =
         const [latest] = await binanceFuturesGet<RawLongShortRatio[]>(
           "/futures/data/globalLongShortAccountRatio",
           { symbol: toUsdtSymbol(base), period: "1h", limit: 1 }
-        )
+        ).catch((): RawLongShortRatio[] => [])
         return { base, latest }
       })
     )
@@ -211,9 +211,10 @@ export const getMarketSentiment =
         },
       ]
     })
-    const updatedAt = Math.max(
-      ...rows.map(({ latest }) => latest?.timestamp ?? 0)
+    const timestamps = rows.flatMap(({ latest }) =>
+      latest ? [latest.timestamp] : []
     )
+    const updatedAt = timestamps.length ? Math.max(...timestamps) : Date.now()
     return { updatedAt: new Date(updatedAt).toISOString(), items }
   }
 

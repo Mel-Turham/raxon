@@ -157,7 +157,13 @@ export const MarketInsights = ({ insights }: { insights: Insights }) => {
         value={segment}
       />
       <FadeSwap swapKey={segment}>
-        <QuotesTable key={segment} quotes={insights[segment]} />
+        {insights[segment].length ? (
+          <QuotesTable key={segment} quotes={insights[segment]} />
+        ) : (
+          <p className="flex min-h-60 items-center justify-center text-sm text-muted-foreground">
+            {segment} quotes are unavailable right now.
+          </p>
+        )}
       </FadeSwap>
     </MarketCard>
   )
