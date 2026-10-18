@@ -179,3 +179,7 @@ The main TypeScript aliases are `@/*`, `@shared/*` and `@features/*`.
 - TypeScript strict mode is enabled and `bun run typecheck` passes.
 - `bun run lint` currently fails to start: `typescript-eslint` does not support TypeScript 7 yet.
 - There is no automated test suite yet.
+
+## License
+
+Raxon is released under the [MIT License](./LICENSE).

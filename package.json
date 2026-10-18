@@ -4,6 +4,7 @@
   "type": "module",
   "private": true,
   "author": "Mel Turham",
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
